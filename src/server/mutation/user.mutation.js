@@ -54,8 +54,8 @@ const createUserMutation = {
   }
 };
 
-const updateCoordinateMutation = {
-  name: 'updateCoordinate',
+const userUpdateCoordinateMutation = {
+  name: 'userUpdateCoordinate',
   inputFields: {
     lat: {type: new GraphQLNonNull(GraphQLFloat)},
     lon: {type: new GraphQLNonNull(GraphQLFloat)}
@@ -82,7 +82,7 @@ const updateCoordinateMutation = {
 
 const UserMutation = {
   createUser: mutationWithClientMutationId(createUserMutation),
-  updateCoordinate: mutationWithClientMutationId(updateCoordinateMutation)
+  updateCoordinate: mutationWithClientMutationId(userUpdateCoordinateMutation)
 };
 
 export default UserMutation;
