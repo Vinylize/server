@@ -24,9 +24,10 @@ const ConnectionMutation = {
         resolve: (payload) => payload.result
       }
     },
-    mutateAndGetPayload: ({category, subCategory}) => {
+    mutateAndGetPayload: ({category, subCategory},{user}) => {
       return new Promise((resolve, reject) => {
         return firebase.refs.connection.push({
+          port: user.uid,
           category,
           subCategory,
           ...firebase.defaultSchema.connection
