@@ -1,24 +1,22 @@
-import apidoc from 'gulp-apidoc';
 import babel from 'gulp-babel';
 import envFile from 'node-env-file';
 import gulp from 'gulp';
 import nodemon from 'gulp-nodemon';
 import rimraf from 'rimraf';
-import runSequence from 'run-sequence';
 import sourcemaps from 'gulp-sourcemaps';
 
 const SOURCE = {
   ALL: 'src/**/*.js',
-  DIST: 'dist',
+  DIST: 'dist'
 };
 
-gulp.task('default', ['build'], () => {
+gulp.task('dev', ['build'], () => {
   envFile('./env.dev.list');
   return nodemon({
     script: './dist/server/app.js',
     watch: [SOURCE.ALL],
     tasks: ['build'],
-    env: { NODE_ENV: 'development' },
+    env: { NODE_ENV: 'development' }
   });
 });
 
