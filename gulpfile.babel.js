@@ -20,6 +20,17 @@ gulp.task('dev', ['build'], () => {
   });
 });
 
+gulp.task('prod', ['build'], () => {
+  envFile('./env.prod.list');
+  return nodemon({
+    script: './dist/server/app.js',
+    watch: [SOURCE.ALL],
+    tasks: ['build'],
+    env: { NODE_ENV: 'production' }
+  });
+});
+
+
 gulp.task('build', ['clean'], () => {
   return gulp.src(SOURCE.ALL)
     .pipe(sourcemaps.init())
