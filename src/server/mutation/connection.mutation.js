@@ -11,18 +11,31 @@ import firebase from '../util/firebase.util';
 import UserType from '../type/user.type';
 import ConnectionType from '../type/connection.type';
 
-
 const ConnectionMutation = {
   createConnection: mutationWithClientMutationId({
     name: 'createConnection',
-    inputFields: {},
+    inputFields: {
+      category: {type: new GraphQLNonNull(GraphQLString)},
+      subCategory: {type: new GraphQLNonNull(GraphQLString)}
+    },
     outputFields: {
       result: {
         type: GraphQLString,
         resolve: (payload) => payload.result
       }
     },
-    mutateAndGetPayload: ({}) => {
+    mutateAndGetPayload: ({category, subCategory}) => {
+      return new Promise((resolve, reject) => {
+        return firebase.refs.connection.push({
+          category,
+          subCategory,
+          ...firebase.defaultSchema.connection
+        })
+          .then(()=> {
+            resolve({result: 'OK'});
+          })
+          .catch(reject);
+      });
     }
   })
 };
