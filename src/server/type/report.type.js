@@ -13,6 +13,7 @@ const ReportType = new GraphQLObjectType({
   name: 'Snippet',
   description: 'SnippetType of Recbook',
   fields: () => ({
+    id: { type: GraphQLString },
     reporter: { type: UserType },
     connection: { type: ConnectionType},
     category: { type: GraphQLInt },

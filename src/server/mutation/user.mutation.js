@@ -36,6 +36,9 @@ const createUserMutation = {
       })
         .then((createdUser) => {
           return firebase.refs.user.child(createdUser.uid).set({
+            id: createdUser.uid,
+            email: email,
+            name: name,
             ...firebase.defaultSchema.user
           })
             .then(() => {
@@ -90,11 +93,10 @@ const userRequestPhoneValidationMutation = {
     return new Promise((resolve, reject) => {
       if (user) {
         const code = smsUtil.getRandomCode();
-        console.log(code);
         smsUtil.sendVerificationMessage(phoneNumber, code);
         return firebase.refs.userPhoneValidationInfo.child(user.uid).set({
           code,
-          ...firebase.defaultSchema.userPhoneValidationInfo
+          expiredAt: Date.now() + (120 * 1000)
         })
           .then(() => resolve({result: 'OK'}))
           .catch(reject);
@@ -118,7 +120,6 @@ const userResponsePhoneValidationMutation = {
       if (user) {
         return firebase.refs.userPhoneValidationInfo.child(user.uid).once('value')
           .then((snap) => {
-          console.log(snap.val(), Date.now());
             if (snap.val().expiredAt < Date.now()) {
               // top priority
               return reject('time exceeded.');

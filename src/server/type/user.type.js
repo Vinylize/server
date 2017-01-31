@@ -83,6 +83,8 @@ const UserType = new GraphQLObjectType({
     isPhoneValid: { type: GraphQLBoolean },
     rating: { type: GraphQLInt },
     country: { type: GraphQLString },
+    profileImageUrl: { type: GraphQLString },
+    identificationImageUrl: { type: GraphQLString },
     coordinate: {
       type: CoordinateType,
       resolve: (source) => {

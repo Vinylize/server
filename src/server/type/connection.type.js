@@ -44,6 +44,7 @@ const ConnectionType = new GraphQLObjectType({
   name: 'Connection',
   description: 'ConnectionType of User.',
   fields: () => ({
+    id: { type: GraphQLString },
     port: { type: UserType },
     ship: { type: UserType },
     category: { type: GraphQLInt },
