@@ -38,7 +38,7 @@ app.post('/graphql', jwtUtil.apiProtector, graphqlHTTP((request) => {
     graphiql: true,
     rootValue: { request },
     extensions(ext) {
-      // TODO : Fhtttind why `logger.debug(ext.result)` doesn't work on this part.
+      // TODO : Find why `logger.debug(ext.result)` doesn't work on this part.
       // logger.debug(ext.result);
       console.log(ext.result);
       return { runTime: `${Date.now() - startTime}ms` };

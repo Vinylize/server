@@ -42,13 +42,13 @@ const createUserMutation = {
             ...firebase.defaultSchema.user
           })
             .then(() => {
-              return firebase.refs.userPortQualification.child(createdUser.uid).set({
-                ...firebase.defaultSchema.userPortQualification
+              return firebase.refs.user.orderQualification.child(createdUser.uid).set({
+                ...firebase.defaultSchema.user.orderQualification
               });
             })
             .then(() => {
-              return firebase.refs.userShipQualification.child(createdUser.uid).set({
-                ...firebase.defaultSchema.userShipQualification
+              return firebase.refs.userRunnerQualification.child(createdUser.uid).set({
+                ...firebase.defaultSchema.userRunnerQualification
               });
             });
         })
@@ -94,7 +94,7 @@ const userRequestPhoneValidationMutation = {
       if (user) {
         const code = smsUtil.getRandomCode();
         smsUtil.sendVerificationMessage(phoneNumber, code);
-        return firebase.refs.userPhoneValidationInfo.child(user.uid).set({
+        return firebase.refs.userPhoneVerificationInfo.child(user.uid).set({
           code,
           expiredAt: Date.now() + (120 * 1000)
         })
@@ -118,7 +118,7 @@ const userResponsePhoneValidationMutation = {
   mutateAndGetPayload: ({ code }, { user }) => {
     return new Promise((resolve, reject) => {
       if (user) {
-        return firebase.refs.userPhoneValidationInfo.child(user.uid).once('value')
+        return firebase.refs.userPhoneVerificationInfo.child(user.uid).once('value')
           .then((snap) => {
             if (snap.val().expiredAt < Date.now()) {
               // top priority

@@ -12,8 +12,8 @@ import firebase from '../util/firebase.util';
 import ConnectionType from './connection.type';
 import ReportType from './report.type';
 
-const PortQualificationType = new GraphQLObjectType({
-  name: 'PortQualification',
+const OrderQualificationType = new GraphQLObjectType({
+  name: 'OrderQualification',
   description: 'Type of properties of port.',
   fields: () => ({
     isAgreed: { type: GraphQLBoolean },
@@ -21,8 +21,8 @@ const PortQualificationType = new GraphQLObjectType({
   })
 });
 
-const ShipQualificationType = new GraphQLObjectType({
-  name: 'ShipQualification',
+const RunnerQualificationType = new GraphQLObjectType({
+  name: 'RunnerQualification',
   description: 'Type of properties of ship.',
   fields: () => ({
     isAgreed: { type: GraphQLBoolean },
@@ -62,9 +62,9 @@ const AddressType = new GraphQLObjectType({
   })
 });
 
-const PhoneValidationInfoType = new GraphQLObjectType({
-  name: 'phoneValidationInfo',
-  description: 'phoneValidationInfoType of user.',
+const PhoneVerificationInfoType = new GraphQLObjectType({
+  name: 'phoneVerificationInfo',
+  description: 'phoneVerificationInfoType of user.',
   fields: () => ({
     code: { type: GraphQLInt },
     expiredAt: { type: GraphQLDate }
@@ -97,10 +97,10 @@ const UserType = new GraphQLObjectType({
       }
     },
     portQualification: {
-      type: PortQualificationType,
+      type: OrderQualificationType,
       resolve: (source, args, { user }) => {
         return new Promise((resolve, reject) => {
-          firebase.refs.userPortQualification.child(source.id).once('value')
+          firebase.refs.user.orderQualification.child(source.id).once('value')
           .then((snap) => {
             return resolve(snap.val());
           });
@@ -108,10 +108,10 @@ const UserType = new GraphQLObjectType({
       }
     },
     shipQualification: {
-      type: ShipQualificationType,
+      type: RunnerQualificationType,
       resolve: (source, args, { user }) => {
         return new Promise((resolve, reject) => {
-          firebase.refs.userShipQualification.child(source.id).once('value')
+          firebase.refs.userRunnerQualification.child(source.id).once('value')
             .then((snap) => {
               return resolve(snap.val());
             });
@@ -138,11 +138,11 @@ const UserType = new GraphQLObjectType({
         });
       }
     },
-    phoneValidationInfo: {
-      type: PhoneValidationInfoType,
+    phoneVerificationInfo: {
+      type: PhoneVerificationInfoType,
       resolve: (source, args, { user }) => {
         return new Promise((resolve, reject) => {
-          firebase.refs.userPhoneValidationInfo.child(source.id).once('value')
+          firebase.refs.userPhoneVerificationInfo.child(source.id).once('value')
             .then((snap) => resolve(snap.val()))
             .catch(reject);
         });

@@ -9,26 +9,56 @@ const adminOption = {
 admin.initializeApp(adminOption);
 
 const db = admin.database();
+
 const userRef = db.ref('/user');
-const userPropertiesRef = db.ref('/userProperties');
-const connectionRef = db.ref('/connection');
-const connectionPropertiesRef = db.ref('/connectionProperties');
-const reportRef = db.ref('/report');
+const propertiesRef = db.ref('/properties');
+
+const orderRef = db.ref('/order');
+const orderPropertiesRef = db.ref('/connectionProperties');
+
+const nodeRef = db.ref('/node');
+const nodePropertiesRef = db.ref('/nodeProperties');
+
+const partnerRef = db.ref('/partner');
+const partnerPropertiesRef = db.ref('/partnerProperties');
+
+const helpRef = db.ref('/help');
 
 const refs = {
-  user: userRef,
-  userProperties: userPropertiesRef,
-  userPortQualification: userPropertiesRef.child('portQualification'),
-  userShipQualification: userPropertiesRef.child('shipQualification'),
-  userCoordinate: userPropertiesRef.child('coordinate'),
-  userPaymentInfo: userPropertiesRef.child('paymentInfo'),
-  userAddress: userPropertiesRef.child('address'),
-  userPhoneValidationInfo: userPropertiesRef.child('phoneValidationInfo'),
-  connection: connectionRef,
-  connectionProperties: connectionPropertiesRef,
-  connectionReward: connectionPropertiesRef.child('reward'),
-  connectionGoods: connectionPropertiesRef.child('goods'),
-  report: reportRef
+  user: {
+    root: userRef,
+    properties: propertiesRef,
+    userQualification: propertiesRef.child('userQualification'),
+    runnerQualification: propertiesRef.child('runnerQualification'),
+    coordinate: propertiesRef.child('coordinate'),
+    userPaymentInfo: propertiesRef.child('userPaymentInfo'),
+    runnerPaymentInfo: propertiesRef.child('runnerPaymentInfo'),
+    address: propertiesRef.child('address'),
+    phoneVerificationInfo: propertiesRef.child('phoneVerificationInfo')
+  },
+  order: {
+    root: orderRef,
+    properties: orderPropertiesRef,
+    nodeInfo: orderPropertiesRef.child('nodeInfo'),
+    paymentDetail: orderPropertiesRef.child('paymentDetail'),
+    calculateDetail: orderPropertiesRef.child('calculateDetail'),
+    evalFromUser: orderPropertiesRef.child('evalFromUser'),
+    evalFromRunner: orderPropertiesRef.child('evalFromRunner')
+  },
+  node: {
+    root: nodeRef,
+    properties: nodePropertiesRef,
+    items: nodePropertiesRef.child('items')
+  },
+  partner: {
+    root: partnerRef,
+    properties: partnerPropertiesRef,
+    qualification: partnerPropertiesRef.child('qualification'),
+    paymentInfo: partnerPropertiesRef.child('paymentInfo')
+  },
+  help: {
+    root: helpRef
+  }
 };
 
 const defaultSchema = {
@@ -39,17 +69,19 @@ const defaultSchema = {
     rating: 0,
     country: null
   },
-  userPortQualification: {
+  orderQualification: {
     isAgreed: false,
     agreedAt: null
   },
-  userShipQualification: {
+  userRunnerQualification: {
     isAgreed: false,
     agreedAt: null,
-    isApproved: false,
-    approvedAt: null
+    isFirstApproved: false,
+    firstApprovedAt: null,
+    isSecondApproved: false,
+    secondApprovedAt: null
   },
-  userPhoneValidationInfo: {
+  userPhoneVerificationInfo: {
     expiredAt: Date.now() + 120000
   },
   connection: {
