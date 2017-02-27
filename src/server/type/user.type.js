@@ -27,11 +27,11 @@ const RunnerQualificationType = new GraphQLObjectType({
   description: 'Type of properties of ship.',
   fields: () => ({
     isAgreed: { type: GraphQLBoolean },
-    agreedAt: {type: GraphQLDate },
+    agreedAt: { type: GraphQLDate },
     isFirstApproved: { type: GraphQLBoolean },
-    firstApprovedAt: {type: GraphQLDate },
+    firstApprovedAt: { type: GraphQLDate },
     isSecondApproved: { type: GraphQLBoolean },
-    secondApprovedAt: {type: GraphQLDate }
+    secondApprovedAt: { type: GraphQLDate }
   })
 });
 
