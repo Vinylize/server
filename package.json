@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Vinylize/vinyl-server#readme",
   "dependencies": {
     "babel-preset-stage-0": "^6.16.0",
-    "bcrypt": "^1.0.1",
+    "bcrypt": "^1.0.2",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "express-graphql": "^0.6.1",

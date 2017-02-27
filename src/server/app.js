@@ -5,9 +5,12 @@ import graphqlHTTP from 'express-graphql';
 import logger from 'winston';
 
 import jwtUtil from './util/jwt.util';
+
 import UserMutation from './mutation/user.mutation';
-import ConnectionMutation from './mutation/connection.mutation';
-import ReportMutation from './mutation/report.mutation';
+import OrderMutation from './mutation/order.mutation';
+import NodeMutation from './mutation/node.mutation';
+import PartnerMutation from './mutation/partner.mutation';
+
 import ViewerQuery from './query/viewer.query';
 
 const app = express();
@@ -25,8 +28,8 @@ const schema = new GraphQLSchema({
     description: 'Root Mutation of the Recbook Schema',
     fields: () => ({
       ...UserMutation,
-      ...ConnectionMutation,
-      ...ReportMutation
+      ...OrderMutation,
+      ...NodeMutation
     })
   })
 });

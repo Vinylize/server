@@ -8,7 +8,7 @@ import {
 
 import firebase from '../util/firebase.util';
 import UserType from '../type/user.type';
-import ConnectionType from '../type/connection.type';
+import ConnectionType from '../type/order.type';
 
 const connectionOpenPortMutation = {
   name: 'connectionOpenPort',
@@ -88,9 +88,9 @@ const connectionStartShipMutation = {
   }
 };
 
-const ConnectionMutation = {
+const OrderMutation = {
   connectionOpenPort: mutationWithClientMutationId(connectionOpenPortMutation),
   connectionStartShip: mutationWithClientMutationId(connectionStartShipMutation)
 };
 
-export default ConnectionMutation;
+export default OrderMutation;
