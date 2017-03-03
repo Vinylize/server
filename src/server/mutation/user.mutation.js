@@ -22,7 +22,7 @@ const saltRounds = 10;
 
 const createUserMutation = {
   name: 'createUser',
-  description: 'Register',
+  description: 'Register User to firebase via yetta server.',
   inputFields: {
     email: {type: new GraphQLNonNull(GraphQLString)},
     name: {type: new GraphQLNonNull(GraphQLString)},
