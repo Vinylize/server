@@ -5,33 +5,31 @@ import {
 const payload = {
   notification: {
     title: 'Notification from Yetta',
-    body: 'This is Yetta server.',
-    click_action: "message"
+    body: 'You are babo'
+    // click_action: 'pingstersapp.ACTION.message'
   },
   data: {
-    user: "tempUser34142413214343",
+    component: 'newOrder',
+    props: '3e2wfri34no823ijeo83euh2'
   }
 };
 
-var options = {
+let options = {
   priority: 'high',
   content_available: true,
-  // priority: 'normal',
 
   // expire sec
   timeToLive: 60 * 60 * 24
 };
 
-
-const sendPush = (registrationToken) => {
-  return admin.messaging().sendToDevice(registrationToken, payload, options)
-    .then(function (response) {
+const sendPush = registrationToken => admin.messaging()
+  .sendToDevice(registrationToken, payload, options)
+    .then((response) => {
       console.log('Successfully sent message:', response);
     })
     .catch(function (error) {
       console.log('Error sending message:', error);
     });
-};
 export default {
   sendPush
 };
