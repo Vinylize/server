@@ -48,7 +48,7 @@ const schema = new GraphQLSchema({
       ...OrderMutation,
       ...NodeMutation,
       ...PartnerMutation,
-      ...PushMutation
+      ...PushMutation,
     })
   })
 });
@@ -60,7 +60,6 @@ app.post(
       const startTime = Date.now();
       return {
         schema,
-        graphiql: true,
         rootValue: { request },
         extensions(ext) {
       // TODO : Find why `logger.debug(ext.result)` doesn't work on this part.
@@ -96,10 +95,19 @@ app.post(
     '/graphql/upload',
     authUtil.apiProtector,
     multer({ storage }).single('file'),
-    graphqlHTTP(request => ({
-      schema: uploadSchema,
-      rootValue: { request }
-    })));
+    graphqlHTTP((request) => {
+      const startTime = Date.now();
+      return {
+        schema: uploadSchema,
+        rootValue: { request },
+        extensions(ext) {
+        // TODO : Find why `logger.debug(ext.result)` doesn't work on this part.
+        // logger.debug(ext.result);
+          console.log(ext.result);
+          return { runTime: `${Date.now() - startTime}ms` };
+        }
+      };
+    }));
 
 app.listen(PORT, () => {
   logger.info(`Vinyl api server listening on port ${PORT}!`);
