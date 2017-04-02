@@ -21,9 +21,11 @@ const createNodeFromAdminMutation = {
   name: 'createNodeFromAdmin',
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
+    phone: { type: GraphQLString },
     address: { type: new GraphQLNonNull(GraphQLString) },
     category1: { type: new GraphQLNonNull(GraphQLString) },
-    category2: { type: new GraphQLNonNull(GraphQLString) },
+    imageUrl: { type: GraphQLString },
+    category2: { type: GraphQLString },
     type: { type: new GraphQLNonNull(GraphQLString) },
     lat: { type: new GraphQLNonNull(GraphQLFloat) },
     lon: { type: new GraphQLNonNull(GraphQLFloat) },
@@ -34,23 +36,37 @@ const createNodeFromAdminMutation = {
       resolve: payload => payload.result
     }
   },
-  mutateAndGetPayload: ({ name, address, category1, category2, type, lat, lon }, { user }) => new Promise((resolve, reject) => {
-    if (user) {
+  mutateAndGetPayload: (
+    {
+      name,
+      imageUrl,
+      phone,
+      address,
+      category1,
+      category2,
+      type,
+      lat,
+      lon
+    }, { user }
+    ) => new Promise((resolve, reject) => {
+      if (user) {
       // Create new node root in firebase.
-      const newRef = refs.node.root.push();
-      const newNodeKey = newRef.key;
-      return newRef.set({
-        id: newNodeKey,
-        name,
-        address,
-        category1,
-        category2,
-        type,
-        createdAt: Date.now(),
-        ...defaultSchema.node.root
-      })
-      // Create new nodePriperties in firebase.
-        .then(() => nodeGeoFire.set(user.uid, [lat, lon])
+        const newRef = refs.node.root.push();
+        const newNodeKey = newRef.key;
+        return newRef.set({
+          id: newNodeKey,
+          name,
+          imageUrl: imageUrl || null,
+          phone,
+          address,
+          category1,
+          category2,
+          type,
+          createdAt: Date.now(),
+          ...defaultSchema.node.root
+        })
+        // Create new nodePriperties in firebase.
+        .then(() => nodeGeoFire.set(newNodeKey, [lat, lon])
           .then(() => null, (error) => {
             reject(error);
           }))
@@ -58,9 +74,9 @@ const createNodeFromAdminMutation = {
           resolve({ result: newNodeKey });
         })
         .catch(reject);
-    }
-    return reject('This mutation needs accessToken.');
-  })
+      }
+      return reject('This mutation needs accessToken.');
+    })
 };
 
 const createNodeFromPartnerMutation = {
