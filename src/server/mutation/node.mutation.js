@@ -13,6 +13,10 @@ import {
   refs
 } from '../util/firebase.util';
 
+import {
+  nodeGeoFire
+} from '../util/firebase.geofire.util';
+
 const createNodeFromAdminMutation = {
   name: 'createNodeFromAdmin',
   inputFields: {
@@ -22,7 +26,7 @@ const createNodeFromAdminMutation = {
     category2: { type: new GraphQLNonNull(GraphQLString) },
     type: { type: new GraphQLNonNull(GraphQLString) },
     lat: { type: new GraphQLNonNull(GraphQLFloat) },
-    lng: { type: new GraphQLNonNull(GraphQLFloat) },
+    lon: { type: new GraphQLNonNull(GraphQLFloat) },
   },
   outputFields: {
     result: {
@@ -30,7 +34,7 @@ const createNodeFromAdminMutation = {
       resolve: payload => payload.result
     }
   },
-  mutateAndGetPayload: ({ name, address, category1, category2, type, lat, lng }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ name, address, category1, category2, type, lat, lon }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       // Create new node root in firebase.
       const newRef = refs.node.root.push();
@@ -46,10 +50,10 @@ const createNodeFromAdminMutation = {
         ...defaultSchema.node.root
       })
       // Create new nodePriperties in firebase.
-        .then(() => refs.node.coordinate.child(newNodeKey).set({
-          lat,
-          lng,
-        }))
+        .then(() => nodeGeoFire.set(user.uid, [lat, lon])
+          .then(() => null, (error) => {
+            reject(error);
+          }))
         .then(() => {
           resolve({ result: newNodeKey });
         })
