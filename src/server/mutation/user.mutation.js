@@ -28,9 +28,9 @@ const createUserMutation = {
   name: 'createUser',
   description: 'Register User to firebase via yetta server.',
   inputFields: {
-    email: { type: new GraphQLNonNull(GraphQLString) },
-    name: { type: new GraphQLNonNull(GraphQLString) },
-    password: { type: new GraphQLNonNull(GraphQLString) }
+    e: { type: new GraphQLNonNull(GraphQLString) },
+    n: { type: new GraphQLNonNull(GraphQLString) },
+    pw: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     result: {
@@ -38,19 +38,19 @@ const createUserMutation = {
       resolve: payload => payload.result
     }
   },
-  mutateAndGetPayload: ({ email, password, name }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ e, pw, n }) => new Promise((resolve, reject) => {
     admin.auth().createUser({
-      email,
+      email: e,
       emailVerified: false,
-      password,
-      displayName: name,
+      password: pw,
+      displayName: n,
       disabled: false
     })
         .then(createdUser => refs.user.root.child(createdUser.uid).set({
           id: createdUser.uid,
-          e: email,
-          pw: bcrypt.hashSync(password, saltRounds),
-          n: name,
+          e,
+          pw: bcrypt.hashSync(pw, saltRounds),
+          n,
           cAt: Date.now(),
           ...defaultSchema.user.root
         })
@@ -92,20 +92,20 @@ const userRequestPhoneVerifiactionMutation = {
   name: 'userRequestPhoneVerification',
   description: 'Send verification message to user.',
   inputFields: {
-    phoneNumber: { type: new GraphQLNonNull(GraphQLString) }
+    p: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ phoneNumber }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ p }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       const code = smsUtil.getRandomCode();
-      smsUtil.sendVerificationMessage(phoneNumber, code);
+      smsUtil.sendVerificationMessage(p, code);
       return refs.user.phoneVerificationInfo.child(user.uid).set({
         code,
         eAt: Date.now() + (120 * 1000)
       })
-          .then(() => refs.user.root.child(user.uid).child('p').set(phoneNumber))
+          .then(() => refs.user.root.child(user.uid).child('p').set(p))
           .then(() => resolve({ result: 'OK' }))
           .catch(reject);
     }
