@@ -48,10 +48,10 @@ const createUserMutation = {
     })
         .then(createdUser => refs.user.root.child(createdUser.uid).set({
           id: createdUser.uid,
-          email,
-          password: bcrypt.hashSync(password, saltRounds),
-          name,
-          createdAt: Date.now(),
+          e: email,
+          pw: bcrypt.hashSync(password, saltRounds),
+          n: name,
+          cAt: Date.now(),
           ...defaultSchema.user.root
         })
             .then(() => refs.user.userQualification.child(createdUser.uid).set({
@@ -103,9 +103,9 @@ const userRequestPhoneVerifiactionMutation = {
       smsUtil.sendVerificationMessage(phoneNumber, code);
       return refs.user.phoneVerificationInfo.child(user.uid).set({
         code,
-        expiredAt: Date.now() + (120 * 1000)
+        eAt: Date.now() + (120 * 1000)
       })
-          .then(() => refs.user.root.child(user.uid).child('phoneNumber').set(phoneNumber))
+          .then(() => refs.user.root.child(user.uid).child('p').set(phoneNumber))
           .then(() => resolve({ result: 'OK' }))
           .catch(reject);
     }
@@ -126,7 +126,7 @@ const userResponsePhoneVerificationMutation = {
     if (user) {
       return refs.user.phoneVerificationInfo.child(user.uid).once('value')
           .then((snap) => {
-            if (snap.val().expiredAt < Date.now()) {
+            if (snap.val().eAt < Date.now()) {
               // top priority
               return reject('time exceeded.');
             } else if (snap.val().code !== code) {
@@ -135,7 +135,8 @@ const userResponsePhoneVerificationMutation = {
             }
             return null;
           })
-          .then(() => refs.user.root.child(user.uid).child('isPhoneValid').set(true))
+          .then(() => refs.user.root.child(user.uid).child('isPV').set(true))
+          .then(() => refs.user.phoneVerificationInfo.child(user.uid).child('vAt').set(Date.now()))
           .then(() => resolve({ result: 'OK' }))
           .catch(reject);
     }

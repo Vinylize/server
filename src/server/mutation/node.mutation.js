@@ -38,9 +38,9 @@ const createNodeFromAdminMutation = {
   },
   mutateAndGetPayload: (
     {
-      name,
+      n,
       imgUrl,
-      phone,
+      p,
       addr,
       c1,
       c2,
@@ -55,9 +55,9 @@ const createNodeFromAdminMutation = {
         const newNodeKey = newRef.key;
         return newRef.set({
           id: newNodeKey,
-          name,
-          imageUrl: imgUrl || null,
-          phone,
+          n,
+          imgUrl: imgUrl || null,
+          p,
           addr,
           c1,
           c2,

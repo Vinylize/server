@@ -98,7 +98,7 @@ const uploadNodeImageMutation = {
             return reject(err);
           }
           const imageUrl = `${s3BaseUrl}${s3BucketName}/${key}`;
-          return refs.node.root.child(nodeId).child('imageUrl').set(imageUrl)
+          return refs.node.root.child(nodeId).child('imgUrl').set(imageUrl)
             .then(() => resolve({ imageUrl }));
         });
       }

@@ -11,8 +11,9 @@ const NodeType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
-    phone: { type: GraphQLString },
+    p: { type: GraphQLString },
     type: { type: GraphQLString },
+    imgUrl: { type: GraphQLString },
     addr: { type: GraphQLString },
     c1: { type: GraphQLString },
     c2: { type: GraphQLString },
