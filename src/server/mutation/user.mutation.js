@@ -39,6 +39,7 @@ const createUserMutation = {
     }
   },
   mutateAndGetPayload: ({ e, pw, n }) => new Promise((resolve, reject) => {
+    // create user at firebase
     admin.auth().createUser({
       email: e,
       emailVerified: false,
