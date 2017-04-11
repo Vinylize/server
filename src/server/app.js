@@ -109,6 +109,16 @@ app.post(
       };
     }));
 
-app.listen(PORT, () => {
-  logger.info(`Vinyl api server listening on port ${PORT}!`);
+const startServer = afterServerStartCallback => app.listen(PORT, () => {
+  if (afterServerStartCallback) {
+    afterServerStartCallback();
+  }
 });
+
+if (process.env.NODE_ENV !== 'test') {
+  startServer(() => {
+    logger.info(`Vinyl api server listening on port ${PORT}!`);
+  });
+}
+
+export default startServer;

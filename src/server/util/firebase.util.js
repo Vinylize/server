@@ -1,14 +1,23 @@
 import admin from 'firebase-admin';
+import firebase from 'firebase';
 
-const serviceAccount = require(`../../../${process.env.FIREBASE_SERVICE_ACCOUNT_JSON}`);
-const adminOption = {
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_URL
+const serviceAccount = (process.env.NODE_ENV === 'test') ?
+  undefined :
+  require(`../../../${process.env.FIREBASE_SERVICE_ACCOUNT_JSON}`);
+
+const config = {
+  apiKey: (process.env.NODE_ENV === 'test') ? null : null,
+  credential: (process.env.NODE_ENV === 'test') ? null : admin.credential.cert(serviceAccount),
+  databaseURL: (process.env.NODE_ENV === 'test') ? 'ws://localhost.firebaseio.test:5000;' : process.env.FIREBASE_URL,
 };
 
-admin.initializeApp(adminOption);
+if (process.env.NODE_ENV === 'test') {
+  firebase.initializeApp(config);
+} else {
+  admin.initializeApp(config);
+}
 
-const db = admin.database();
+const db = (process.env.NODE_ENV === 'test') ? firebase.database() : admin.database();
 
 const userRef = db.ref('/user');
 const userPropertiesRef = db.ref('/userProperties');
