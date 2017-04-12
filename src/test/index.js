@@ -8,9 +8,11 @@ import startServer from '../server/app';
 new FirebaseServer(5000, 'localhost.firebaseio.test');
 /* eslint-enable */
 
+/* eslint-disable func-names*/
 it('Server open test.', function (done) {
   this.timeout(5000);
   startServer(() => {
     done();
   });
 });
+/* eslint-enable func-names */
