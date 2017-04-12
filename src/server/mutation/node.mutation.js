@@ -20,12 +20,11 @@ import {
 const createNodeFromAdminMutation = {
   name: 'createNodeFromAdmin',
   inputFields: {
-    name: { type: new GraphQLNonNull(GraphQLString) },
-    phone: { type: GraphQLString },
-    address: { type: new GraphQLNonNull(GraphQLString) },
-    category1: { type: new GraphQLNonNull(GraphQLString) },
-    imageUrl: { type: GraphQLString },
-    category2: { type: GraphQLString },
+    n: { type: new GraphQLNonNull(GraphQLString) },
+    p: { type: GraphQLString },
+    addr: { type: new GraphQLNonNull(GraphQLString) },
+    c1: { type: new GraphQLNonNull(GraphQLString) },
+    c2: { type: GraphQLString },
     type: { type: new GraphQLNonNull(GraphQLString) },
     lat: { type: new GraphQLNonNull(GraphQLFloat) },
     lon: { type: new GraphQLNonNull(GraphQLFloat) },
@@ -38,12 +37,12 @@ const createNodeFromAdminMutation = {
   },
   mutateAndGetPayload: (
     {
-      name,
-      imageUrl,
-      phone,
-      address,
-      category1,
-      category2,
+      n,
+      imgUrl,
+      p,
+      addr,
+      c1,
+      c2,
       type,
       lat,
       lon
@@ -55,14 +54,13 @@ const createNodeFromAdminMutation = {
         const newNodeKey = newRef.key;
         return newRef.set({
           id: newNodeKey,
-          name,
-          imageUrl: imageUrl || null,
-          phone,
-          address,
-          category1,
-          category2,
+          n,
+          p,
+          addr,
+          c1,
+          c2,
           type,
-          createdAt: Date.now(),
+          cAt: Date.now(),
           ...defaultSchema.node.root
         })
         // Create new nodePriperties in firebase.
@@ -79,30 +77,30 @@ const createNodeFromAdminMutation = {
     })
 };
 
-const createNodeFromPartnerMutation = {
-  name: 'createNodeFromPartner',
-  inputFields: {
-    name: { type: new GraphQLNonNull(GraphQLString) },
-    address: { type: new GraphQLNonNull(GraphQLString) },
-    category1: { type: new GraphQLNonNull(GraphQLString) },
-    category2: { type: new GraphQLNonNull(GraphQLString) },
-    type: { type: new GraphQLNonNull(GraphQLString) },
-    lat: { type: new GraphQLNonNull(GraphQLFloat) },
-    lon: { type: new GraphQLNonNull(GraphQLFloat) },
-  },
-  outputFields: {
-    result: {
-      type: GraphQLString,
-      resolve: payload => payload.result
-    }
-  },
-  mutateAndGetPayload: () => {
-  }
-};
+// const createNodeFromPartnerMutation = {
+//   name: 'createNodeFromPartner',
+//   inputFields: {
+//     name: { type: new GraphQLNonNull(GraphQLString) },
+//     addr: { type: new GraphQLNonNull(GraphQLString) },
+//     c1: { type: new GraphQLNonNull(GraphQLString) },
+//     c2: { type: new GraphQLNonNull(GraphQLString) },
+//     type: { type: new GraphQLNonNull(GraphQLString) },
+//     lat: { type: new GraphQLNonNull(GraphQLFloat) },
+//     lon: { type: new GraphQLNonNull(GraphQLFloat) },
+//   },
+//   outputFields: {
+//     result: {
+//       type: GraphQLString,
+//       resolve: payload => payload.result
+//     }
+//   },
+//   mutateAndGetPayload: () => {
+//   }
+// };
 
 const NodeMutation = {
   createNodeFromAdmin: mutationWithClientMutationId(createNodeFromAdminMutation),
-  createNodeFromPartner: mutationWithClientMutationId(createNodeFromPartnerMutation),
+  // createNodeFromPartner: mutationWithClientMutationId(createNodeFromPartnerMutation),
 };
 
 export default NodeMutation;

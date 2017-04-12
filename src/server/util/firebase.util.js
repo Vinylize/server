@@ -1,26 +1,31 @@
 import admin from 'firebase-admin';
 
 const serviceAccount = require(`../../../${process.env.FIREBASE_SERVICE_ACCOUNT_JSON}`);
-const adminOption = {
+
+const config = {
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_URL
+  databaseURL: process.env.FIREBASE_URL,
 };
 
-admin.initializeApp(adminOption);
+admin.initializeApp(config);
 
-const db = admin.database();
+const time = Date.now().toString();
+const env = process.env.NODE_ENV;
+console.log(process.env.NODE_ENV);
 
-const userRef = db.ref('/user');
-const userPropertiesRef = db.ref('/userProperties');
+const db = (env === 'test') ? admin.database().ref(`test${time}`) : admin.database().ref();
 
-const orderRef = db.ref('/order');
-const orderPropertiesRef = db.ref('/orderProperties');
+const userRef = db.child('/user');
+const userPropertiesRef = db.child('/userProperties');
 
-const nodeRef = db.ref('/node');
-const nodePropertiesRef = db.ref('/nodeProperties');
+const orderRef = db.child('/order');
+const orderPropertiesRef = db.child('/orderProperties');
 
-const partnerRef = db.ref('/partner');
-const partnerPropertiesRef = db.ref('/partnerProperties');
+const nodeRef = db.child('/node');
+const nodePropertiesRef = db.child('/nodeProperties');
+
+const partnerRef = db.child('/partner');
+const partnerPropertiesRef = db.child('/partnerProperties');
 
 // synchronized with documentation
 const refs = {
@@ -62,42 +67,43 @@ const refs = {
 const defaultSchema = {
   user: {
     root: {
-      identificationImageUrl: null,
-      profileImageUrl: null,
-      isPhoneValid: false,
-      phoneNumber: null,
-      rating: 5,
+      idUrl: null,
+      pUrl: null,
+      isPV: false,
+      p: null,
+      r: 5,
+      dt: null
     },
     orderQualification: {
-      isAgreed: false,
-      agreedAt: null
+      isA: false,
+      aAt: null
     },
     runnerQualification: {
-      isAgreed: false,
-      agreedAt: null,
-      isFirstApproved: false,
-      firstApprovedAt: null,
-      isSecondApproved: false,
-      secondApprovedAt: null
+      isA: false,
+      aAt: null,
+      isFA: false,
+      fAAt: null,
+      isSA: false,
+      sAAt: null
     }
   },
   order: {
     root: {
-      runnerId: null,
-      receiptImage: null,
-      realDeliveryPrice: null,
-      isExpired: false
+      rId: null,
+      rImg: null,
+      EDP: null,
+      RDP: null,
     },
     itemInfo: {
 
     },
     evalFromUser: {
-      mark: 3,
-      comment: null
+      m: 3,
+      comm: null
     },
     evalFromRunner: {
-      mark: 3,
-      comment: null
+      m: 3,
+      comm: null
     }
   },
   node: {
@@ -105,17 +111,17 @@ const defaultSchema = {
       like: 0
     },
     items: {
-      itemImageUrl: null
+      iImgUrl: null
     }
   },
   partner: {
     root: {
     },
     qualification: {
-      isAgreed: false,
-      agreedAt: null,
-      isFirstApproved: false,
-      firstApprovedAt: null
+      isA: false,
+      aAt: null,
+      isFA: false,
+      fAAt: null
     }
   }
 };
