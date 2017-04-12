@@ -54,7 +54,7 @@ gulp.task('test', ['istanbul'], () => {
   ])
     .pipe(mocha())
     .pipe(istanbul.writeReports())
-    // we should make threshholds to upper then 80%~90%
+    // we should make threshholds to upper then 80% ~ 90%
     .pipe(istanbul.enforceThresholds({ thresholds: { global: 0 } }));
 });
 
@@ -65,7 +65,7 @@ gulp.task('istanbul', ['build:test'], () => gulp.src(['dist-test/server/**/*.js'
 gulp.task('build:test', ['clean:test'], () => gulp.src(SOURCE.ALL)
   .pipe(sourcemaps.init())
   .pipe(babel())
-  .pipe(sourcemaps.write('.'))
+  .pipe(sourcemaps.write())
   .pipe(gulp.dest(SOURCE.DIST_TEST)));
 
 gulp.task('clean', () => rimraf.sync(SOURCE.DIST));
