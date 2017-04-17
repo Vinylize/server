@@ -193,37 +193,13 @@ const userAddAddressMutation = {
   })
 };
 
-const userEvalOrderMutation = {
-  name: 'userEvalOrder',
-  description: 'user evaluate order',
-  inputFields: {
-    oId: { type: new GraphQLNonNull(GraphQLString) },
-    m: { type: new GraphQLNonNull(GraphQLInt) },
-    comm: { type: new GraphQLNonNull(GraphQLString) }
-  },
-  outputFields: {
-    result: { type: GraphQLString, resolve: payload => payload.result }
-  },
-  mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
-    if (user) {
-      const newRef = refs.order.evalFromUser.child(oId);
-      return newRef.child('m').set(m)
-      .then(() => newRef.child('comm').set(comm))
-      .then(() => resolve({ result: 'OK' }))
-      .catch(reject);
-    }
-    return reject('This mutation needs accessToken.');
-  })
-};
-
 const UserMutation = {
   createUser: mutationWithClientMutationId(createUserMutation),
   userUpdateCoordinate: mutationWithClientMutationId(userUpdateCoordinateMutation),
   userRequestPhoneVerification: mutationWithClientMutationId(userRequestPhoneVerifiactionMutation),
   userResponsePhoneVerification: mutationWithClientMutationId(userResponsePhoneVerificationMutation),
   userAgree: mutationWithClientMutationId(userAgreeMutation),
-  userAddAddress: mutationWithClientMutationId(userAddAddressMutation),
-  userEvalOrder: mutationWithClientMutationId(userEvalOrderMutation)
+  userAddAddress: mutationWithClientMutationId(userAddAddressMutation)
 };
 
 export default UserMutation;
