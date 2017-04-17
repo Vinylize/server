@@ -164,18 +164,26 @@ const userAgreeMutation = {
   })
 };
 
-const userDisagreeMutation = {
-  name: 'userDisagree',
-  description: 'user agree agreement',
+const userAddAddressMutation = {
+  name: 'userAddAddress',
+  description: 'user add address',
   inputFields: {
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    mainAddress: { type: new GraphQLNonNull(GraphQLString) },
+    subAddress: { type: new GraphQLNonNull(GraphQLString) },
+    lat: { type: new GraphQLNonNull(GraphQLFloat) },
+    lon: { type: new GraphQLNonNull(GraphQLFloat) }
   },
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ name, mainAddress, subAddress, lat, lon }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      return refs.user.userQualification.child(user.uid).child('isA').set(false)
-      .then(() => refs.user.userQualification.child(user.uid).child('aAt').set(Date.now()))
+      return refs.user.address.child(user.uid).child('name').set(name)
+      .then(() => refs.user.address.child(user.uid).child('mainAddress').set(mainAddress))
+      .then(() => refs.user.address.child(user.uid).child('subAddress').set(subAddress))
+      .then(() => refs.user.address.child(user.uid).child('lat').set(lat))
+      .then(() => refs.user.address.child(user.uid).child('lon').set(lon))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -189,7 +197,7 @@ const UserMutation = {
   userRequestPhoneVerification: mutationWithClientMutationId(userRequestPhoneVerifiactionMutation),
   userResponsePhoneVerification: mutationWithClientMutationId(userResponsePhoneVerificationMutation),
   userAgree: mutationWithClientMutationId(userAgreeMutation),
-  userDisagree: mutationWithClientMutationId(userDisagreeMutation)
+  userAddAddress: mutationWithClientMutationId(userAddAddressMutation)
 };
 
 export default UserMutation;
