@@ -109,4 +109,7 @@ const OrderType = new GraphQLObjectType({
   })
 });
 
-export default OrderType;
+export {
+  OrderType,
+  ItemType
+};

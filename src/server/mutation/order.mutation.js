@@ -2,32 +2,20 @@ import {
   GraphQLString,
   GraphQLNonNull,
   GraphQLInt,
-  GraphQLList,
-  GraphQLInputObjectType,
-  GraphQLFloat
+  GraphQLList
 } from 'graphql';
 import {
   mutationWithClientMutationId
 } from 'graphql-relay';
 
 import {
+  ItemType
+} from '../type/order.type';
+
+import {
   defaultSchema,
   refs
 } from '../util/firebase.util';
-
-const ItemType = new GraphQLInputObjectType({
-  name: 'Item',
-  fields: () => ({
-    nId: { type: new GraphQLNonNull(GraphQLString) },
-    iId: { type: new GraphQLNonNull(GraphQLString) },
-    cnt: { type: new GraphQLNonNull(GraphQLInt) },
-    type: { type: new GraphQLNonNull(GraphQLInt) },
-    curr: { type: new GraphQLNonNull(GraphQLInt) },
-    price: { type: new GraphQLNonNull(GraphQLFloat) },
-// if custom type
-    iName: { type: GraphQLString },
-  })
-});
 
 const userCreateOrderMutation = {
   name: 'userCreateOrder',
