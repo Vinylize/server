@@ -155,9 +155,9 @@ const userAgreeMutation = {
   },
   mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      const ref = refs.user.userQualification.child(user.uid);
-      return ref.child('isA').set(true)
-      .then(() => ref.child('aAt').set(Date.now()))
+      const newRef = refs.user.userQualification.child(user.uid);
+      return newRef.child('isA').set(true)
+      .then(() => newRef.child('aAt').set(Date.now()))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -180,12 +180,35 @@ const userAddAddressMutation = {
   },
   mutateAndGetPayload: ({ name, mAddr, sAddr, lat, lon }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      const newRefs = refs.user.address.child(user.uid).push();
-      return newRefs.child('name').set(name)
-      .then(() => newRefs.child('mAddr').set(mAddr))
-      .then(() => newRefs.child('sAddr').set(sAddr))
-      .then(() => newRefs.child('lat').set(lat))
-      .then(() => newRefs.child('lon').set(lon))
+      const newRef = refs.user.address.child(user.uid).push();
+      return newRef.child('name').set(name)
+      .then(() => newRef.child('mAddr').set(mAddr))
+      .then(() => newRef.child('sAddr').set(sAddr))
+      .then(() => newRef.child('lat').set(lat))
+      .then(() => newRef.child('lon').set(lon))
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
+const userEvalOrderMutation = {
+  name: 'userEvalOrder',
+  description: 'user evaluate order',
+  inputFields: {
+    oId: { type: new GraphQLNonNull(GraphQLString) },
+    m: { type: new GraphQLNonNull(GraphQLInt) },
+    comm: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
+    if (user) {
+      const newRef = refs.order.evalFromUser.child(oId);
+      return newRef.child('m').set(m)
+      .then(() => newRef.child('comm').set(comm))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -199,7 +222,8 @@ const UserMutation = {
   userRequestPhoneVerification: mutationWithClientMutationId(userRequestPhoneVerifiactionMutation),
   userResponsePhoneVerification: mutationWithClientMutationId(userResponsePhoneVerificationMutation),
   userAgree: mutationWithClientMutationId(userAgreeMutation),
-  userAddAddress: mutationWithClientMutationId(userAddAddressMutation)
+  userAddAddress: mutationWithClientMutationId(userAddAddressMutation),
+  userEvalOrder: mutationWithClientMutationId(userEvalOrderMutation)
 };
 
 export default UserMutation;
