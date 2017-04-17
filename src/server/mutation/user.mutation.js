@@ -145,11 +145,51 @@ const userResponsePhoneVerificationMutation = {
   })
 };
 
+const userAgreeMutation = {
+  name: 'userAgree',
+  description: 'user agree agreement',
+  inputFields: {
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
+    if (user) {
+      return refs.user.userQualification.child(user.uid).child('isA').set(true)
+      .then(() => refs.user.userQualification.child(user.uid).child('aAt').set(Date.now()))
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
+const userDisagreeMutation = {
+  name: 'userDisagree',
+  description: 'user agree agreement',
+  inputFields: {
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
+    if (user) {
+      return refs.user.userQualification.child(user.uid).child('isA').set(false)
+      .then(() => refs.user.userQualification.child(user.uid).child('aAt').set(Date.now()))
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
 const UserMutation = {
   createUser: mutationWithClientMutationId(createUserMutation),
   userUpdateCoordinate: mutationWithClientMutationId(userUpdateCoordinateMutation),
   userRequestPhoneVerification: mutationWithClientMutationId(userRequestPhoneVerifiactionMutation),
-  userResponsePhoneVerification: mutationWithClientMutationId(userResponsePhoneVerificationMutation)
+  userResponsePhoneVerification: mutationWithClientMutationId(userResponsePhoneVerificationMutation),
+  userAgree: mutationWithClientMutationId(userAgreeMutation),
+  userDisagree: mutationWithClientMutationId(userDisagreeMutation)
 };
 
 export default UserMutation;
