@@ -155,8 +155,9 @@ const userAgreeMutation = {
   },
   mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      return refs.user.userQualification.child(user.uid).child('isA').set(true)
-      .then(() => refs.user.userQualification.child(user.uid).child('aAt').set(Date.now()))
+      const ref = refs.user.userQualification.child(user.uid);
+      return ref.child('isA').set(true)
+      .then(() => ref.child('aAt').set(Date.now()))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -169,21 +170,22 @@ const userAddAddressMutation = {
   description: 'user add address',
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
-    mainAddress: { type: new GraphQLNonNull(GraphQLString) },
-    subAddress: { type: new GraphQLNonNull(GraphQLString) },
+    mAddr: { type: new GraphQLNonNull(GraphQLString) },
+    sAddr: { type: new GraphQLNonNull(GraphQLString) },
     lat: { type: new GraphQLNonNull(GraphQLFloat) },
     lon: { type: new GraphQLNonNull(GraphQLFloat) }
   },
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ name, mainAddress, subAddress, lat, lon }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ name, mAddr, sAddr, lat, lon }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      return refs.user.address.child(user.uid).child('name').set(name)
-      .then(() => refs.user.address.child(user.uid).child('mainAddress').set(mainAddress))
-      .then(() => refs.user.address.child(user.uid).child('subAddress').set(subAddress))
-      .then(() => refs.user.address.child(user.uid).child('lat').set(lat))
-      .then(() => refs.user.address.child(user.uid).child('lon').set(lon))
+      const newRefs = refs.user.address.child(user.uid).push();
+      return newRefs.child('name').set(name)
+      .then(() => newRefs.child('mAddr').set(mAddr))
+      .then(() => newRefs.child('sAddr').set(sAddr))
+      .then(() => newRefs.child('lat').set(lat))
+      .then(() => newRefs.child('lon').set(lon))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
