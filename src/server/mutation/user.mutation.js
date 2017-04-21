@@ -156,8 +156,10 @@ const userAgreeMutation = {
   mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       const newRef = refs.user.userQualification.child(user.uid);
-      return newRef.child('isA').set(true)
-      .then(() => newRef.child('aAt').set(Date.now()))
+      return newRef.set({
+        isA: true,
+        aAt: Date.now()
+      })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -181,11 +183,13 @@ const userAddAddressMutation = {
   mutateAndGetPayload: ({ name, mAddr, sAddr, lat, lon }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       const newRef = refs.user.address.child(user.uid).push();
-      return newRef.child('name').set(name)
-      .then(() => newRef.child('mAddr').set(mAddr))
-      .then(() => newRef.child('sAddr').set(sAddr))
-      .then(() => newRef.child('lat').set(lat))
-      .then(() => newRef.child('lon').set(lon))
+      return newRef.set({
+        name,
+        mAddr,
+        sAddr,
+        lat,
+        lon
+      })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }

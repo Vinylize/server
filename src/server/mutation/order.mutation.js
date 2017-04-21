@@ -17,6 +17,10 @@ import {
   refs
 } from '../util/firebase.util';
 
+import {
+  calcEDP
+} from '../util/delivery.util';
+
 const userCreateOrderMutation = {
   name: 'userCreateOrder',
   inputFields: {
@@ -36,20 +40,23 @@ const userCreateOrderMutation = {
         // Create new order root in firebase.
       const newRef = refs.order.root.push();
       const newOrderKey = newRef.key;
-      return newRef.set({
-        id: newOrderKey,
-        oId: user.uid,
-            // TODO : define order's category( delivery & runner )
-        dC,
-        rC,
-        curr,
-            // TODO : impl price calculation logic.
-        EDP: 10000,
-        eAt: Date.now() + (300 * 1000),
-        ...defaultSchema.order.root,
+      return calcEDP(items)
+      .then((EDP) => {
+        newRef.set({
+          id: newOrderKey,
+          oId: user.uid,
+              // TODO : define order's category( delivery & runner )
+          dC,
+          rC,
+          curr,
+              // TODO : impl price calculation logic.
+          EDP,
+          eAt: Date.now() + (300 * 1000),
+          ...defaultSchema.order.root,
+        });
       })
         // Create new orderPriperties in firebase.
-          .then(() => refs.order.itemInfo.child(newOrderKey).set({
+          .then(() => refs.order.items.child(newOrderKey).set({
             ...items
           }))
           .then(() => {
@@ -114,8 +121,10 @@ const userEvalOrderMutation = {
   mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       const newRef = refs.order.evalFromUser.child(oId);
-      return newRef.child('m').set(m)
-      .then(() => newRef.child('comm').set(comm))
+      return newRef.set({
+        m,
+        comm
+      })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -137,8 +146,10 @@ const runnerEvalOrderMutation = {
   mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       const newRef = refs.order.evalFromRunner.child(oId);
-      return newRef.child('m').set(m)
-      .then(() => newRef.child('comm').set(comm))
+      return newRef.newRef.set({
+        m,
+        comm
+      })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }

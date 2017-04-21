@@ -43,7 +43,7 @@ const refs = {
   order: {
     root: orderRef,
     properties: orderPropertiesRef,
-    itemInfo: orderPropertiesRef.child('itemInfo'),
+    items: orderPropertiesRef.child('items'),
     paymentDetail: orderPropertiesRef.child('paymentDetail'),
     calculateDetail: orderPropertiesRef.child('calculateDetail'),
     evalFromUser: orderPropertiesRef.child('evalFromUser'),
