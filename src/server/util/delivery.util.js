@@ -1,29 +1,42 @@
 import GeoFire from 'geofire';
-import { nodeGeoFire } from './firebase.geofire.util';
+import {
+  userGeoFire,
+  nodeGeoFire
+} from './firebase.geofire.util';
 
-const defaultDistance = 100; // in meters
-const distanceUnit = 100; // in meters
-const defaultFee = 2000; // in KRW
-const additionalFee = 100; // per distance unit , in KRW
-let EDP = 0;
+const calcEDP = (items, uId) => new Promise((resolve, reject) => {
+  userGeoFire.get(uId)
+  .then((location1) => {
+    const defaultDistance = 100; // in meters
+    const distanceUnit = 100; // in meters
+    const defaultFee = 2000; // in KRW
+    const additionalFee = 100; // per distance unit , in KRW
+    const nodes = [];
+    let EDP = 0;
 
-const addEDP = (location) => {
-  const distance = GeoFire.distance(location[0], location[1]) * 1000; // in meters
-  const additionalDistance = distance - defaultDistance;
-  EDP += additionalDistance > 0 ? Math.ceil(additionalDistance / distanceUnit) * additionalFee : defaultFee;
-};
+    const addEDP = (location2) => {
+      const distance = GeoFire.distance(location1, location2) * 1000; // in meters
+      const additionalDistance = distance - defaultDistance;
+      EDP += additionalDistance > 0 ? Math.ceil(additionalDistance / distanceUnit) * additionalFee : defaultFee;
+    };
 
-const calcEDP = ({ items }) => new Promise((resolve, reject) => {
-  const nodes = [];
-  for (let i = 0; i < items.length; ++i) {
-    if (nodes.indexOf(items[i].nId) < 0) {
-      nodes.push(items[i].nId);
-      nodeGeoFire.get(items[i].nId)
-      .then(addEDP)
+    const pushLocation = (index) => {
+      nodeGeoFire.get(nodes[index])
+      .then((location) => {
+        addEDP(location);
+        if (index === nodes.length - 1) resolve(EDP);
+      })
       .catch(reject);
+    };
+
+    for (let i = 0; i < items.length; ++i) {
+      if (nodes.indexOf(items[i].nId) < 0) {
+        nodes.push(items[i].nId);
+        pushLocation(i);
+      }
     }
-  }
-  resolve(EDP);
+  })
+  .catch(reject);
 });
 
 export default calcEDP;

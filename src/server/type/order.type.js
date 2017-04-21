@@ -20,7 +20,7 @@ const ItemType = new GraphQLInputObjectType({
     iId: { type: GraphQLString },
     cnt: { type: GraphQLInt },
     price: { type: GraphQLInt },
-    curr: { type: GraphQLInt },
+    curr: { type: GraphQLString },
     pSAt: { type: GraphQLFloat },
     pFAt: { type: GraphQLFloat },
 // if custom type

@@ -17,9 +17,7 @@ import {
   refs
 } from '../util/firebase.util';
 
-import {
-  calcEDP
-} from '../util/delivery.util';
+import calcEDP from '../util/delivery.util';
 
 const userCreateOrderMutation = {
   name: 'userCreateOrder',
@@ -40,7 +38,7 @@ const userCreateOrderMutation = {
         // Create new order root in firebase.
       const newRef = refs.order.root.push();
       const newOrderKey = newRef.key;
-      return calcEDP(items)
+      return calcEDP(items, user.uid)
       .then((EDP) => {
         newRef.set({
           id: newOrderKey,

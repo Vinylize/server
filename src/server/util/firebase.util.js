@@ -90,10 +90,9 @@ const defaultSchema = {
     root: {
       rId: null,
       rImg: null,
-      EDP: null,
       RDP: null,
     },
-    itemInfo: {
+    items: {
 
     },
     evalFromUser: {
