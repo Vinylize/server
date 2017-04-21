@@ -20,7 +20,7 @@ const calcEDP = (items, uId) => new Promise((resolve, reject) => {
       EDP += additionalDistance > 0 ? Math.ceil(additionalDistance / distanceUnit) * additionalFee : defaultFee;
     };
 
-    const pushLocation = (index) => {
+    const getLocation = (index) => {
       nodeGeoFire.get(nodes[index])
       .then((location) => {
         addEDP(location);
@@ -32,7 +32,7 @@ const calcEDP = (items, uId) => new Promise((resolve, reject) => {
     for (let i = 0; i < items.length; ++i) {
       if (nodes.indexOf(items[i].nId) < 0) {
         nodes.push(items[i].nId);
-        pushLocation(i);
+        getLocation(i);
       }
     }
   })
