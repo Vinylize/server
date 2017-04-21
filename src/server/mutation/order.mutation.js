@@ -117,7 +117,7 @@ const userEvalOrderMutation = {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
   mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
-    // TODO : check this oreder is really this user's oreder.
+    // TODO : check this order is really this user's order.
     if (user) {
       const newRef = refs.order.evalFromUser.child(oId);
       return newRef.set({
@@ -144,7 +144,7 @@ const runnerEvalOrderMutation = {
   },
   mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      // TODO : check this oreder is really this runner's oreder.
+      // TODO : check this order is really this runner's order.
       const newRef = refs.order.evalFromRunner.child(oId);
       return newRef.newRef.set({
         m,
