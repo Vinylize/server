@@ -17,7 +17,7 @@ import {
   refs
 } from '../util/firebase.util';
 
-import calcEDP from '../util/delivery.util';
+import calcPrice from '../util/order.util';
 
 const userCreateOrderMutation = {
   name: 'userCreateOrder',
@@ -38,8 +38,8 @@ const userCreateOrderMutation = {
         // Create new order root in firebase.
       const newRef = refs.order.root.push();
       const newOrderKey = newRef.key;
-      return calcEDP(items, user.uid)
-      .then((EDP) => {
+      return calcPrice(items, user.uid)
+      .then((result) => {
         newRef.set({
           id: newOrderKey,
           oId: user.uid,
@@ -48,7 +48,8 @@ const userCreateOrderMutation = {
           rC,
           curr,
               // TODO : impl price calculation logic.
-          EDP,
+          EDP: result[0],
+          itemP: result[1],
           eAt: Date.now() + (300 * 1000),
           ...defaultSchema.order.root,
         });
