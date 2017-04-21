@@ -4,7 +4,7 @@ import {
   nodeGeoFire
 } from './firebase.geofire.util';
 
-const calcEDP = (items, uId) => new Promise((resolve, reject) => {
+const calcPrice = (items, uId) => new Promise((resolve, reject) => {
   userGeoFire.get(uId)
   .then((location1) => {
     const defaultDistance = 100; // in meters
@@ -13,6 +13,7 @@ const calcEDP = (items, uId) => new Promise((resolve, reject) => {
     const additionalFee = 100; // per distance unit , in KRW
     const nodes = [];
     let EDP = 0;
+    let itemP = 0;
 
     const addEDP = (location2) => {
       const distance = GeoFire.distance(location1, location2) * 1000; // in meters
@@ -24,12 +25,13 @@ const calcEDP = (items, uId) => new Promise((resolve, reject) => {
       nodeGeoFire.get(nodes[index])
       .then((location) => {
         addEDP(location);
-        if (index === nodes.length - 1) resolve(EDP);
+        if (index === nodes.length - 1) resolve([EDP, itemP]);
       })
       .catch(reject);
     };
 
     for (let i = 0; i < items.length; ++i) {
+      itemP += items[i].cnt * items[i].price;
       if (nodes.indexOf(items[i].nId) < 0) {
         nodes.push(items[i].nId);
         getLocation(i);
@@ -39,4 +41,4 @@ const calcEDP = (items, uId) => new Promise((resolve, reject) => {
   .catch(reject);
 });
 
-export default calcEDP;
+export default calcPrice;
