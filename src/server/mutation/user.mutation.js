@@ -66,6 +66,24 @@ const createUserMutation = {
   })
 };
 
+const userUpdateNameMutation = {
+  name: 'userUpdateNameMutation',
+  description: 'user update their name.',
+  inputFields: {
+    n: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  outputFields: {
+    result: {
+      type: GraphQLString,
+      resolve: payload => payload.result
+    }
+  },
+  mutateAndGetPayload: ({ n }, { user }) => new Promise((resolve, reject) =>
+    refs.user.root.child(user.uid).child('n').set(n)
+      .then(resolve({ result: 'OK' }))
+      .catch(reject))
+};
+
 const userUpdateCoordinateMutation = {
   name: 'userUpdateCoordinate',
   description: '',
@@ -199,6 +217,7 @@ const userAddAddressMutation = {
 
 const UserMutation = {
   createUser: mutationWithClientMutationId(createUserMutation),
+  userUpdatename: mutationWithClientMutationId(userUpdateNameMutation),
   userUpdateCoordinate: mutationWithClientMutationId(userUpdateCoordinateMutation),
   userRequestPhoneVerification: mutationWithClientMutationId(userRequestPhoneVerifiactionMutation),
   userResponsePhoneVerification: mutationWithClientMutationId(userResponsePhoneVerificationMutation),
