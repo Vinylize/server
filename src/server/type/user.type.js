@@ -177,7 +177,11 @@ const UserType = new GraphQLObjectType({
       type: new GraphQLList(OrderType),
       resolve: source => new Promise((resolve, reject) => {
         refs.order.root.orderByChild('oId').equalTo(source.id).once('value')
-          .then(snap => resolve(Object.keys(snap.val()).map(key => snap.val()[key])))
+          .then(snap => resolve(
+            Object.keys(snap.val())
+            .map(key => snap.val()[key])
+            .sort((a, b) => b.cAt - a.cAt))
+          )
           .catch(reject);
       })
     },

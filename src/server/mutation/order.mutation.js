@@ -39,8 +39,8 @@ const CustomItemType = new GraphQLInputObjectType({
 });
 
 const DestType = new GraphQLInputObjectType({
-  name: 'Dest',
-  description: 'Destination of order',
+  name: 'destInput',
+  description: 'Destination of order.',
   fields: () => ({
     n1: { type: new GraphQLNonNull(GraphQLString) },
     n2: { type: GraphQLString },
