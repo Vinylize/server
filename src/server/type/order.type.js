@@ -11,6 +11,7 @@ import {
 } from '../util/firebase.util';
 
 import UserType from './user.type';
+import NodeType from './node.type';
 
 const RegularItemType = new GraphQLObjectType({
   name: 'regularItem',
@@ -37,18 +38,19 @@ const ItemType = new GraphQLObjectType({
   name: 'Item',
   description: 'item of order.',
   fields: () => ({
-    regItem: {
-      type: new GraphQLList(RegularItemType),
-      resolve: (source) => {
-        console.log(source);
-      }
-    },
-    customItem: {
-      type: new GraphQLList(CustomItemType),
-      resolve: (source) => {
-        console.log(source);
-      }
-    }
+    regItem: { type: new GraphQLList(RegularItemType) },
+    customItem: { type: new GraphQLList(CustomItemType) }
+  })
+});
+
+const DestType = new GraphQLObjectType({
+  name: 'dest',
+  description: 'Destination of order.',
+  fields: () => ({
+    n1: { type: GraphQLString },
+    n2: { type: GraphQLString },
+    lat: { type: GraphQLFloat },
+    lon: { type: GraphQLFloat },
   })
 });
 
@@ -89,7 +91,12 @@ const OrderType = new GraphQLObjectType({
   description: 'OrderType of User.',
   fields: () => ({
     id: { type: GraphQLString },
-    nId: { type: GraphQLString },
+    nId: {
+      type: NodeType,
+      resolve: () => {
+
+      }
+    },
     oId: {
       type: UserType,
       resolve: source => new Promise((resolve, reject) => {
@@ -109,11 +116,34 @@ const OrderType = new GraphQLObjectType({
           .catch(reject);
       })
     },
+    items: {
+      type: ItemType,
+      resolve: source => new Promise((resolve, reject) => {
+        let regItem = [];
+        let customItem = [];
+        return refs.order.regItem.child(source.id).once('value')
+          .then((snap) => {
+            regItem = Object.keys(snap.val()).map(key => snap.val()[key]);
+            return refs.order.customItem.child(source.id).once('value');
+          })
+          .then((snap) => {
+            customItem = Object.keys(snap.val()).map(key => snap.val()[key]);
+            return resolve({ regItem, customItem });
+          })
+          .catch(reject);
+      })
+    },
+    dest: {
+      type: DestType,
+      resolve: source => new Promise((resolve, reject) =>
+        refs.order.dest.child(source.id).once('value')
+          .then(snap => resolve(snap.val()))
+          .catch(reject))
+    },
     rSAt: { type: GraphQLFloat },
     dC: { type: GraphQLInt },
     rC: { type: GraphQLInt },
     rImg: { type: GraphQLString },
-    items: { type: ItemType },
     eDP: { type: GraphQLInt },
     rDP: { type: GraphQLInt },
     tP: { type: GraphQLInt },
