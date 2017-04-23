@@ -75,7 +75,7 @@ const userCreateOrderMutation = {
       }
       const newRef = refs.order.root.push();
       const newOrderKey = newRef.key;
-      return calcPrice(regItems, user.uid)
+      return calcPrice(nId, regItems, [dest.lat, dest.lon])
       .then((result) => {
         newRef.set({
           id: newOrderKey,
