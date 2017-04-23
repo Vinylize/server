@@ -2,15 +2,13 @@ import {
   GraphQLString,
   GraphQLNonNull,
   GraphQLInt,
-  GraphQLList
+  GraphQLList,
+  GraphQLInputObjectType,
+  GraphQLFloat
 } from 'graphql';
 import {
   mutationWithClientMutationId
 } from 'graphql-relay';
-
-import {
-  ItemType
-} from '../type/order.type';
 
 import {
   defaultSchema,
@@ -19,10 +17,45 @@ import {
 
 import calcPrice from '../util/order.util';
 
+const RegularItemType = new GraphQLInputObjectType({
+  name: 'regularItemInput',
+  description: 'Registerd item in node.',
+  fields: () => ({
+    iId: { type: new GraphQLNonNull(GraphQLString) },
+    n: { type: new GraphQLNonNull(GraphQLString) },
+    p: { type: new GraphQLNonNull(GraphQLInt) },
+    cnt: { type: new GraphQLNonNull(GraphQLInt) },
+  })
+});
+
+const CustomItemType = new GraphQLInputObjectType({
+  name: 'customItemInput',
+  description: 'User customed item.',
+  fields: () => ({
+    manu: { type: GraphQLString },
+    n: { type: new GraphQLNonNull(GraphQLString) },
+    cnt: { type: new GraphQLNonNull(GraphQLInt) }
+  })
+});
+
+const DestType = new GraphQLInputObjectType({
+  name: 'Dest',
+  description: 'Destination of order',
+  fields: () => ({
+    n1: { type: new GraphQLNonNull(GraphQLString) },
+    n2: { type: GraphQLString },
+    lat: { type: new GraphQLNonNull(GraphQLFloat) },
+    lon: { type: new GraphQLNonNull(GraphQLFloat) },
+  })
+});
+
 const userCreateOrderMutation = {
   name: 'userCreateOrder',
   inputFields: {
-    items: { type: new GraphQLNonNull(new GraphQLList(ItemType)) },
+    nId: { type: new GraphQLNonNull(GraphQLString) },
+    regItems: { type: new GraphQLList(RegularItemType) },
+    customItems: { type: new GraphQLList(CustomItemType) },
+    dest: { type: new GraphQLNonNull(DestType) },
     dC: { type: new GraphQLNonNull(GraphQLInt) },
     rC: { type: new GraphQLNonNull(GraphQLInt) },
     curr: { type: new GraphQLNonNull(GraphQLString) }
@@ -33,35 +66,46 @@ const userCreateOrderMutation = {
       resolve: payload => payload.result
     }
   },
-  mutateAndGetPayload: ({ items, dC, rC, curr }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ nId, regItems, customItems, dC, dest, rC, curr }, { user }) => new Promise((resolve, reject) => {
     if (user) {
         // Create new order root in firebase.
+      if (regItems.length === 0 && customItems.length === 0) {
+        // if there is no item.
+        reject('There is no items selected.');
+      }
       const newRef = refs.order.root.push();
       const newOrderKey = newRef.key;
-      return calcPrice(items, user.uid)
+      return calcPrice(regItems, user.uid)
       .then((result) => {
         newRef.set({
           id: newOrderKey,
           oId: user.uid,
-              // TODO : define order's category( delivery & runner )
+          nId,
           dC,
           rC,
           curr,
-              // TODO : impl price calculation logic.
-          EDP: result[0],
-          itemP: result[1],
-          eAt: Date.now() + (300 * 1000),
+          // TODO : impl total product price.
+          tP: result[1],
+          // TODO : impl delivery price calculation logic.
+          eDP: result[0],
+          cAt: Date.now(),
           ...defaultSchema.order.root,
-        });
-      })
-        // Create new orderPriperties in firebase.
-          .then(() => refs.order.items.child(newOrderKey).set({
-            ...items
+        })
+          // Create new orderPriperties in firebase.
+          .then(() => refs.order.dest.child(newOrderKey).set({
+            ...dest
+          }))
+          .then(() => refs.order.regItem.child(newOrderKey).set({
+            ...regItems
+          }))
+          .then(() => refs.order.customItem.child(newOrderKey).set({
+            ...customItems
           }))
           .then(() => {
             resolve({ result: newOrderKey });
           })
           .catch(reject);
+      });
     }
     return reject('This mutation needs accessToken.');
   })
