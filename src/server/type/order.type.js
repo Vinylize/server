@@ -123,11 +123,15 @@ const OrderType = new GraphQLObjectType({
         let customItem = [];
         return refs.order.regItem.child(source.id).once('value')
           .then((snap) => {
-            regItem = Object.keys(snap.val()).map(key => snap.val()[key]);
+            if (snap.val() !== null) {
+              regItem = Object.keys(snap.val()).map(key => snap.val()[key]);
+            }
             return refs.order.customItem.child(source.id).once('value');
           })
           .then((snap) => {
-            customItem = Object.keys(snap.val()).map(key => snap.val()[key]);
+            if (snap.val() !== null) {
+              customItem = Object.keys(snap.val()).map(key => snap.val()[key]);
+            }
             return resolve({ regItem, customItem });
           })
           .catch(reject);
