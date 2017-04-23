@@ -126,51 +126,12 @@ const uploadNodeItemImageMutation = {
   })
 };
 
-const runnerApplyFirstJudgeMutation = {
-  name: 'runnerApplyFirstJudge',
-  description: 'runner apply at first judgement',
-  inputFields: {
-  },
-  outputFields: {
-    imgUrl: { type: GraphQLString, resolve: payload => payload.imgUrl }
-  },
-  mutateAndGetPayload: ({ NULL }, { user, file }) => new Promise((resolve, reject) => {
-    if (user) {
-      if (file) {
-        console.log(file);
-        const key = `${s3Keys.identification}/${user.uid}.png`;
-        const params = {
-          Bucket: s3BucketName,
-          Key: key,
-          ACL: 'public-read',
-          Body: file.buffer
-        };
-
-        return s3.putObject(params, (err) => {
-          if (err) {
-            return reject(err);
-          }
-          const idUrl = `${s3BaseUrl}${s3BucketName}/${key}`;
-          return refs.user.root.child(user.uid).set({
-            idUrl,
-            isWJ: true
-          })
-          .then(() => resolve({ idUrl }));
-        });
-      }
-      return reject('There is no image.');
-    }
-    return reject('This mutation needs accessToken.');
-  })
-};
-
 const UploadMutation = {
   userUploadProfileImage: mutationWithClientMutationId(userUploadProfileImageMutation),
   userUploadIdImage: mutationWithClientMutationId(userUploadIdImageMutation),
   runnerUploadReciptImage: mutationWithClientMutationId(runnerUploadReciptImageMutation),
   uploadNodeImage: mutationWithClientMutationId(uploadNodeImageMutation),
-  uploadNodeItemImage: mutationWithClientMutationId(uploadNodeItemImageMutation),
-  runnerApplyFirstJudge: mutationWithClientMutationId(runnerApplyFirstJudgeMutation)
+  uploadNodeItemImage: mutationWithClientMutationId(uploadNodeItemImageMutation)
 };
 
 export default UploadMutation;
