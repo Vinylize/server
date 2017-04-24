@@ -73,7 +73,9 @@ const defaultSchema = {
       isPV: false,
       p: null,
       r: 5,
-      dt: null
+      dt: null,
+      isRA: false,
+      rAAT: null
     },
     orderQualification: {
       isA: false,
