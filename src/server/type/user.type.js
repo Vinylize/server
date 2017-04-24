@@ -125,7 +125,7 @@ const UserType = new GraphQLObjectType({
     pUrl: { type: GraphQLString },
     idUrl: { type: GraphQLString },
     isRA: { type: GraphQLBoolean },
-    rAAT: { type: GraphQLInt },
+    rAAt: { type: GraphQLInt },
     coordinate: {
       type: CoordinateType,
       resolve: source => new Promise((resolve, reject) => {

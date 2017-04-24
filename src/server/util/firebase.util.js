@@ -75,7 +75,7 @@ const defaultSchema = {
       r: 5,
       dt: null,
       isRA: false,
-      rAAT: null
+      rAAt: null
     },
     orderQualification: {
       isA: false,
