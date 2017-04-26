@@ -8,7 +8,7 @@ import {
 
 import {
   refs
-} from '../util/firebase.util';
+} from '../util/firebase/firebase.database.util';
 
 import UserType from './user.type';
 import NodeType from './node.type';
@@ -93,9 +93,11 @@ const OrderType = new GraphQLObjectType({
     id: { type: GraphQLString },
     nId: {
       type: NodeType,
-      resolve: () => {
-
-      }
+      resolve: source => new Promise((resolve, reject) => {
+        refs.node.root.child(source.nId).once('value')
+          .then(snap => resolve(snap.val()))
+          .catch(reject);
+      })
     },
     oId: {
       type: UserType,
@@ -144,6 +146,37 @@ const OrderType = new GraphQLObjectType({
           .then(snap => resolve(snap.val()))
           .catch(reject))
     },
+    status: {
+      type: GraphQLInt,
+      resolve: source => new Promise((resolve, reject) => {
+        // TODO: Need more precise implematation.
+        const expTime = 1000 * 60 * 5;
+        if (source.cancAt) {
+          // cancel from user
+          return resolve(4);
+        }
+        if (source.cAt + expTime > Date.now() && !source.rId) {
+          // waiting for runner
+          return resolve(0);
+        }
+        if (source.cAt + expTime <= Date.now() && !source.rId) {
+          // expired
+          return resolve(1);
+        }
+        if (source.rId && !source.endAt) {
+          // order ongoing
+          return resolve(2);
+        }
+        if (source.rId && source.endAt) {
+          // successfully end.
+          return resolve(3);
+        }
+        return reject('Unknown status.');
+      })
+    },
+
+    cancAt: { type: GraphQLInt },
+    cancDesc: { type: GraphQLString },
     rSAt: { type: GraphQLFloat },
     dC: { type: GraphQLInt },
     rC: { type: GraphQLInt },

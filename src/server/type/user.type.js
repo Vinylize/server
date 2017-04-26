@@ -15,11 +15,11 @@ import category from '../../shared/category/category';
 
 import {
   refs
-} from '../util/firebase.util';
+} from '../util/firebase/firebase.database.util';
 
 import {
   nodeGeoFire
-} from '../util/firebase.geofire.util';
+} from '../util/firebase/firebase.geofire.util';
 
 import {
   issueToken
@@ -208,6 +208,12 @@ const UserType = new GraphQLObjectType({
         refs.user.help.child(source.id).once('value')
             .then(snap => resolve(snap.val()))
             .catch(reject);
+      })
+    },
+    orderStatusCategory: {
+      type: GraphQLString,
+      resolve: () => new Promise((resolve) => {
+        resolve(JSON.stringify(category.orderStatus));
       })
     },
     nodeCategory: {

@@ -1,8 +1,6 @@
-import {
-    admin
-} from './firebase.util';
+import admin from './firebase/firebase';
 
-const tempUid = '2XS4rBALvjOONs0DTvEMNvb4Uzf2';
+const tempUid = 'AZpdgg8SnteR7qgOItyYn1lH0sH3';
 
 export default {
   apiProtector(req, res, next) {
