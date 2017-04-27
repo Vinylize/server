@@ -32,7 +32,7 @@ const adminApproveRunnerFirstJudgeMutation = {
             rAAt: Date.now()
           });
         }
-        return reject('This user haven`t applied yet.');
+        return reject('This user hasn`t applied yet.');
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
@@ -63,7 +63,7 @@ const adminDisapproveRunnerFirstJudgeMutation = {
             rAAt: null
           });
         }
-        return reject('This user haven`t applied yet.');
+        return reject('This user hasn`t applied yet.');
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
