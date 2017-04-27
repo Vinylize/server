@@ -24,15 +24,13 @@ const adminApproveRunnerFirstJudgeMutation = {
       // TODO: check if user is an admin
       return refs.user.root.child(uid).once('value')
       .then((snap) => {
-        if (snap.child('isWJ').val()) {
-          if (snap.child('isRA').val()) return reject('This user has been already approved.');
-          return refs.user.root.child(uid).update({
-            isWJ: false,
-            isRA: true,
-            rAAt: Date.now()
-          });
-        }
-        return reject('This user hasn`t applied yet.');
+        if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
+        if (snap.child('isRA').val()) return reject('This user has been already approved.');
+        return refs.user.root.child(uid).update({
+          isWJ: false,
+          isRA: true,
+          rAAt: Date.now()
+        });
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
@@ -55,15 +53,13 @@ const adminDisapproveRunnerFirstJudgeMutation = {
       // TODO: check if user is an admin
       return refs.user.root.child(uid).once('value')
       .then((snap) => {
-        if (snap.child('isWJ').val()) {
-          if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
-          return refs.user.root.child(uid).update({
-            isWJ: false,
-            isRA: false,
-            rAAt: null
-          });
-        }
-        return reject('This user hasn`t applied yet.');
+        if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
+        if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
+        return refs.user.root.child(uid).update({
+          isWJ: false,
+          isRA: false,
+          rAAt: null
+        });
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);

@@ -41,10 +41,12 @@ const runnerApplyFirstJudgeMutation = {
   },
   mutateAndGetPayload: (_, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      return refs.user.root.child(user.uid).child('idURL').once('value')
+      return refs.user.root.child(user.uid).once('value')
       .then((snap) => {
-        if (snap.val()) return resolve();
-        return reject('Upload identification image first.');
+        if (!snap.child('idUrl').val()) return reject('Upload identification image first.');
+        if (!snap.child('isPV').val()) return reject('Get phone verification first.');
+        if (snap.child('isRA').val()) return reject('You are already a runner.');
+        return resolve();
       })
       .then(() => refs.user.root.child(user.uid).child('isWJ').set(true))
       .catch(reject);
