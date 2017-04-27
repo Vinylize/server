@@ -171,7 +171,7 @@ const userAgreeMutation = {
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: (_, { user }) => new Promise((resolve, reject) => {
     if (user) {
       return refs.user.userQualification.child(user.uid).update({
         isA: true,

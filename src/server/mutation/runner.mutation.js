@@ -18,7 +18,7 @@ const runnerAgreeMutation = {
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: (_, { user }) => new Promise((resolve, reject) => {
     if (user) {
       return refs.user.runnerQualification.child(user.uid).update({
         isA: true,
@@ -39,7 +39,7 @@ const runnerApplyFirstJudgeMutation = {
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: (_, { user }) => new Promise((resolve, reject) => {
     if (user) {
       return refs.user.root.child(user.uid).child('idURL').once('value')
       .then((snap) => {
