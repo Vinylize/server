@@ -44,7 +44,7 @@ const runnerApplyFirstJudgeMutation = {
       return refs.user.root.child(user.uid).once('value')
       .then((snap) => {
         if (!snap.child('idUrl').val()) return reject('Upload identification image first.');
-        if (!snap.child('isPV').val()) return reject('Get phone verification first.');
+        if (!snap.child('isPV').val()) return reject('Verify your phone first.');
         if (snap.child('isRA').val()) return reject('You are already a runner.');
         return resolve();
       })

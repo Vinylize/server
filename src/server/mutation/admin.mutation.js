@@ -25,7 +25,7 @@ const adminApproveRunnerFirstJudgeMutation = {
       return refs.user.root.child(uid).once('value')
       .then((snap) => {
         if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
-        if (!snap.child('isPV').val()) return reject('This user hasn`t gotten phone verification yet.');
+        if (!snap.child('isPV').val()) return reject('This user hasn`t verified phone yet.');
         if (snap.child('isRA').val()) return reject('This user has been already approved.');
         return refs.user.root.child(uid).update({
           isWJ: false,
