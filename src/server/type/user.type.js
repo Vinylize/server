@@ -41,7 +41,6 @@ const RunnerQualificationType = new GraphQLObjectType({
   fields: () => ({
     isA: { type: GraphQLBoolean },
     aAt: { type: GraphQLInt },
-    isWJ: { type: GraphQLBoolean },
     isSA: { type: GraphQLBoolean },
     sAAt: { type: GraphQLInt }
   })
@@ -125,6 +124,7 @@ const UserType = new GraphQLObjectType({
     r: { type: GraphQLFloat },
     pUrl: { type: GraphQLString },
     idUrl: { type: GraphQLString },
+    isWJ: { type: GraphQLBoolean },
     isRA: { type: GraphQLBoolean },
     rAAt: { type: GraphQLInt },
     coordinate: {
