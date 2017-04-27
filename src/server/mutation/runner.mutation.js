@@ -20,8 +20,7 @@ const runnerAgreeMutation = {
   },
   mutateAndGetPayload: ({ NULL }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      const newRef = refs.user.runnerQualification.child(user.uid);
-      return newRef.set({
+      return refs.user.runnerQualification.child(user.uid).update({
         isA: true,
         aAt: Date.now()
       })
