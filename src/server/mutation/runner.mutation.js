@@ -1,5 +1,7 @@
 import {
   GraphQLString,
+  GraphQLFloat,
+  GraphQLNonNull
 } from 'graphql';
 
 import {
@@ -9,6 +11,10 @@ import {
 import {
   refs
 } from '../util/firebase/firebase.database.util';
+
+import {
+  userGeoFire
+} from '../util/firebase/firebase.geofire.util';
 
 const runnerAgreeMutation = {
   name: 'runnerAgree',
@@ -55,9 +61,33 @@ const runnerApplyFirstJudgeMutation = {
   })
 };
 
+const runnerUpdateCoordinateMutation = {
+  name: 'runnerUpdateCoordinate',
+  description: 'runner update coordinate',
+  inputFields: {
+    lat: { type: new GraphQLNonNull(GraphQLFloat) },
+    lon: { type: new GraphQLNonNull(GraphQLFloat) }
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ lat, lon }, { user }) => new Promise((resolve, reject) => {
+    if (user) {
+      return userGeoFire.set(user.uid, [lat, lon])
+        .then(() => {
+          resolve({ result: 'OK' });
+        }, (error) => {
+          reject(error);
+        });
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
 const RunnerMutation = {
   runnerAgree: mutationWithClientMutationId(runnerAgreeMutation),
-  runnerApplyFirstJudge: mutationWithClientMutationId(runnerApplyFirstJudgeMutation)
+  runnerApplyFirstJudge: mutationWithClientMutationId(runnerApplyFirstJudgeMutation),
+  runnerUpdateCoordinate: mutationWithClientMutationId(runnerUpdateCoordinateMutation)
 };
 
 export default RunnerMutation;
