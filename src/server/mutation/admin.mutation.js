@@ -53,12 +53,11 @@ const adminDisapproveRunnerFirstJudgeMutation = {
       return refs.user.root.child(uid).once('value')
       .then((snap) => {
         if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
-        if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
         return refs.user.root.child(uid).update({
           isWJ: false,
           isRA: false,
           rAAt: null
-          // A 'Reason' of disapprovingrunner can be added
+          // A 'Reason' of disapproving runner can be added
         });
       })
       .then(() => resolve({ result: 'OK' }))
@@ -79,14 +78,10 @@ const adminDisapproveRunnerMutation = {
   },
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
-      return refs.user.root.child(uid).once('value')
-      .then((snap) => {
-        if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
-        return refs.user.root.child(uid).update({
-          isWJ: false,
-          isRA: false,
-          rAAt: null
-        });
+      return refs.user.root.child(uid).update({
+        isWJ: false,
+        isRA: false,
+        rAAt: null
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
