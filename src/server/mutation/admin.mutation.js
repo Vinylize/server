@@ -20,8 +20,7 @@ const adminApproveRunnerFirstJudgeMutation = {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
-    if (user) {
-      // TODO: check if user is an admin
+    if (user && user.permission === 'admin') {
       return refs.user.root.child(uid).once('value')
       .then((snap) => {
         if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
@@ -50,20 +49,44 @@ const adminDisapproveRunnerFirstJudgeMutation = {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
-    if (user) {
-      // TODO: check if user is an admin
+    if (user && user.permission === 'admin') {
+      return refs.user.root.child(uid).once('value')
+      .then((snap) => {
+        if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
+        if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
+        return refs.user.root.child(uid).update({
+          isWJ: false,
+          isRA: false,
+          rAAt: null
+          // A 'Reason' of disapprovingrunner can be added
+        });
+      })
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
 
-      // It is possible for runners to be deprived authorization for runner whether applied or not.
-      // return refs.user.root.child(uid).once('value')
-      // .then((snap) => {
-        // if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
-        // if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
-        // resolve();
-      // })
-      return refs.user.root.child(uid).update({
-        isWJ: false,
-        isRA: false,
-        rAAt: null
+const adminDisapproveRunnerMutation = {
+  name: 'adminDisapproveRunner',
+  description: 'admin disapprove runner',
+  inputFields: {
+    uid: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
+    if (user && user.permission === 'admin') {
+      return refs.user.root.child(uid).once('value')
+      .then((snap) => {
+        if (snap.child('isRA').val() === false) return reject('This user has been already disapproved.');
+        return refs.user.root.child(uid).update({
+          isWJ: false,
+          isRA: false,
+          rAAt: null
+        });
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
@@ -74,7 +97,8 @@ const adminDisapproveRunnerFirstJudgeMutation = {
 
 const AdminMutation = {
   adminApproveRunnerFirstJudge: mutationWithClientMutationId(adminApproveRunnerFirstJudgeMutation),
-  adminDisapproveRunnerFirstJudge: mutationWithClientMutationId(adminDisapproveRunnerFirstJudgeMutation)
+  adminDisapproveRunnerFirstJudge: mutationWithClientMutationId(adminDisapproveRunnerFirstJudgeMutation),
+  adminDisapproveRunner: mutationWithClientMutationId(adminDisapproveRunnerMutation)
 };
 
 export default AdminMutation;
