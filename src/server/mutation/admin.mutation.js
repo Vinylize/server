@@ -21,16 +21,21 @@ const adminApproveRunnerFirstJudgeMutation = {
   },
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
-      return refs.user.root.child(uid).once('value')
-      .then((snap) => {
-        if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
-        if (!snap.child('isPV').val()) return reject('This user hasn`t verified phone yet.');
-        if (snap.child('isRA').val()) return reject('This user has been already approved.');
-        return refs.user.root.child(uid).update({
-          isWJ: false,
-          isRA: true,
-          rAAt: Date.now()
-        });
+      // return refs.user.root.child(uid).once('value')
+      // .then((snap) => {
+      //   if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
+      //   if (!snap.child('isPV').val()) return reject('This user hasn`t verified phone yet.');
+      //   if (snap.child('isRA').val()) return reject('This user has been already approved.');
+      //   return refs.user.root.child(uid).update({
+      //     isWJ: false,
+      //     isRA: true,
+      //     rAAt: Date.now()
+      //   });
+      // })
+      return refs.user.root.child(uid).update({
+        isWJ: false,
+        isRA: true,
+        rAAt: Date.now()
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
@@ -50,15 +55,21 @@ const adminDisapproveRunnerFirstJudgeMutation = {
   },
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
-      return refs.user.root.child(uid).once('value')
-      .then((snap) => {
-        if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
-        return refs.user.root.child(uid).update({
-          isWJ: false,
-          isRA: false,
-          rAAt: null
-          // A 'Reason' of disapproving runner can be added
-        });
+      // return refs.user.root.child(uid).once('value')
+      // .then((snap) => {
+      //   if (!snap.child('isWJ').val()) return reject('This user hasn`t applied yet.');
+      //   return refs.user.root.child(uid).update({
+      //     isWJ: false,
+      //     isRA: false,
+      //     rAAt: null
+      //     // A 'Reason' of disapproving runner can be added
+      //   });
+      // })
+      return refs.user.root.child(uid).update({
+        isWJ: false,
+        isRA: false,
+        rAAt: null
+        // A 'Reason' of disapproving runner can be added
       })
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
@@ -90,10 +101,50 @@ const adminDisapproveRunnerMutation = {
   })
 };
 
+const adminBlockUserMutation = {
+  name: 'adminBlockUser',
+  description: 'admin block user',
+  inputFields: {
+    uid: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
+    if (user && user.permission === 'admin') {
+      return refs.user.root.child(uid).child('isB').set(true)
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
+const adminUnblockUserMutation = {
+  name: 'adminUnblockUser',
+  description: 'admin unblock user',
+  inputFields: {
+    uid: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
+    if (user && user.permission === 'admin') {
+      return refs.user.root.child(uid).child('isB').set(false)
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
 const AdminMutation = {
   adminApproveRunnerFirstJudge: mutationWithClientMutationId(adminApproveRunnerFirstJudgeMutation),
   adminDisapproveRunnerFirstJudge: mutationWithClientMutationId(adminDisapproveRunnerFirstJudgeMutation),
-  adminDisapproveRunner: mutationWithClientMutationId(adminDisapproveRunnerMutation)
+  adminDisapproveRunner: mutationWithClientMutationId(adminDisapproveRunnerMutation),
+  adminBlockUser: mutationWithClientMutationId(adminBlockUserMutation),
+  adminUnblockUser: mutationWithClientMutationId(adminUnblockUserMutation)
 };
 
 export default AdminMutation;
