@@ -10,6 +10,11 @@ import {
   refs
 } from '../util/firebase/firebase.database.util';
 
+import {
+  mailType,
+  sendMail
+} from '../util/mail.util';
+
 const adminApproveRunnerFirstJudgeMutation = {
   name: 'adminApproveRunnerFirstJudge',
   description: 'admin approve runner at first judge',
@@ -139,12 +144,34 @@ const adminUnblockUserMutation = {
   })
 };
 
+const adminSendEmailToOneUserMutation = {
+  name: 'adminSendEmailToOneUser',
+  description: 'admin send email',
+  inputFields: {
+    to: { type: new GraphQLNonNull(GraphQLString) },
+    subject: { type: new GraphQLNonNull(GraphQLString) },
+    html: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    result: { type: GraphQLString, resolve: payload => payload.result }
+  },
+  mutateAndGetPayload: ({ to, subject, html }, { user }) => new Promise((resolve, reject) => {
+    if (user && user.permission === 'admin') {
+      return sendMail(mailType.service, to, subject, html)
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
 const AdminMutation = {
   adminApproveRunnerFirstJudge: mutationWithClientMutationId(adminApproveRunnerFirstJudgeMutation),
   adminDisapproveRunnerFirstJudge: mutationWithClientMutationId(adminDisapproveRunnerFirstJudgeMutation),
   adminDisapproveRunner: mutationWithClientMutationId(adminDisapproveRunnerMutation),
   adminBlockUser: mutationWithClientMutationId(adminBlockUserMutation),
-  adminUnblockUser: mutationWithClientMutationId(adminUnblockUserMutation)
+  adminUnblockUser: mutationWithClientMutationId(adminUnblockUserMutation),
+  adminSendEmailToOneUser: mutationWithClientMutationId(adminSendEmailToOneUserMutation)
 };
 
 export default AdminMutation;
