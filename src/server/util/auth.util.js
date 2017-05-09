@@ -30,7 +30,7 @@ export default {
               return next();
             });
         })
-        .catch(error => res.status(200).json({
+        .catch(error => res.status(200).send({
           message: error.message,
           locations: error.locations,
           stack: error.stack,
