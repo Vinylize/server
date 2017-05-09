@@ -19,11 +19,14 @@ export default {
           r.user = decodedToken;
           return refs.user.root.child(r.user.uid).once('value')
             .then((snap) => {
+              if (snap.child('permission').val() === 'admin' && snap.child('e').val() === r.user.email) {
+                r.user.permission = 'admin';
+                return next();
+              }
               if (!r.headers.device) throw new Error('No device id Error.');
               if (snap.val().device && snap.val().device !== r.headers.device) {
                 throw new Error('Another device logged in. Please login again.');
               }
-              if (snap.child('permission').val() === 'admin' && snap.child('e').val() === r.user.email) r.user.permission = 'admin';
               return next();
             });
         })
