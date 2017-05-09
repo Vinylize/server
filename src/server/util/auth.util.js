@@ -30,7 +30,11 @@ export default {
               return next();
             });
         })
-        .catch(error => res.status(401).json({ err: error.message }));
+        .catch(error => res.status(200).json({
+          message: error.message,
+          locations: error.locations,
+          stack: error.stack,
+          path: error.path }));
     }
     return next();
   }
