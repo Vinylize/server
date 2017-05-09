@@ -4,12 +4,13 @@ import {
 } from './firebase/firebase.database.util';
 
 const tempUid = 'AZpdgg8SnteR7qgOItyYn1lH0sH3';
+const tempName = 'YettaTest';
 
 export default {
   apiProtector(req, res, next) {
     const r = req;
     if (r.headers.authorization === 'TT') {
-      r.user = { uid: tempUid, warn: 'this is tempUid.' };
+      r.user = { uid: tempUid, name: tempName, warn: 'this is tempUid.', d: 'TT' };
       return next();
     }
     if (r.headers.authorization) {
@@ -18,6 +19,10 @@ export default {
           r.user = decodedToken;
           return refs.user.root.child(r.user.uid).once('value')
             .then((snap) => {
+              if (!r.headers.device) throw new Error('No device id Error.');
+              if (snap.val().device && snap.val().device !== r.headers.device) {
+                throw new Error('Another device logged in. Please login again.');
+              }
               if (snap.child('permission').val() === 'admin' && snap.child('e').val() === r.user.email) r.user.permission = 'admin';
               return next();
             });
