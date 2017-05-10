@@ -175,7 +175,10 @@ const userResponsePhoneVerificationMutation = {
           .then(() => refs.user.root.child(user.uid).child('isPV').set(true))
           .then(() => refs.user.phoneVerificationInfo.child(user.uid).child('vAt').set(Date.now()))
           .then(() => resolve({ result: 'OK' }))
-          .catch(reject);
+          .catch((e) => {
+            refs.user.root.child(user.uid).child('p').set(null)
+              .then(() => reject(e));
+          });
     }
     return reject('This mutation needs accessToken.');
   })
