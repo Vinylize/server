@@ -24,18 +24,12 @@ export default {
                 return next();
               }
               if (!r.headers.device) {
-                throw new Error({
-                  name: 'unauthorizedError',
-                  message: 'unauthorizedError : No Device id in header.'
-                });
+                throw new Error('unauthorizedError : No Device id in header.');
               }
               if (snap.val().d && snap.val().d !== r.headers.device) {
                 return refs.user.root.child(r.user.uid).update({ d: null, dt: null })
                   .then(() => {
-                    throw new Error({
-                      name: 'unauthorizedError',
-                      message: 'unauthorizedError : Another device logged in. Please login again.'
-                    });
+                    throw new Error('unauthorizedError : Another device logged in. Please login again.');
                   })
                   .catch((e) => { throw new Error(e); });
               }
