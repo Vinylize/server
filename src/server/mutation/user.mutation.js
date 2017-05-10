@@ -142,9 +142,9 @@ const userRequestPhoneVerifiactionMutation = {
         code,
         eAt: Date.now() + (120 * 1000)
       })
-          .then(() => refs.user.root.child(user.uid).child('p').set(p))
-          .then(() => resolve({ result: 'OK' }))
-          .catch(reject);
+        .then(() => refs.user.root.child(user.uid).child('p').set(p))
+        .then(() => resolve({ result: 'OK' }))
+        .catch(reject);
     }
     return reject('This mutation needs accessToken');
   })
@@ -164,13 +164,13 @@ const userResponsePhoneVerificationMutation = {
       return refs.user.phoneVerificationInfo.child(user.uid).once('value')
           .then((snap) => {
             if (snap.val().code === code && snap.val().eAt > Date.now()) {
-              return resolve();
+              return;
             }
             if (snap.val().eAt < Date.now()) {
               // top priority
-              return reject('time exceeded.');
+              throw new Error('Time Exceed.');
             }
-            return reject('wrong code.');
+            throw new Error('Wrong code.');
           })
           .then(() => refs.user.root.child(user.uid).child('isPV').set(true))
           .then(() => refs.user.phoneVerificationInfo.child(user.uid).child('vAt').set(Date.now()))
