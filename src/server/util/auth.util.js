@@ -38,7 +38,6 @@ export default {
         })
         // Format to GraphQLError
         .catch(error => res.status(200).json({ errors: [{
-          name: error.name,
           message: error.message,
           locations: error.locations,
           stack: error.stack,
