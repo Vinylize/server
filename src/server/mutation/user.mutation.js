@@ -81,7 +81,7 @@ const userSignInMutation = {
     if (user) {
       if (dt !== undefined && dt !== 'undefined') {
         return refs.user.root.child(user.uid).update({ dt, d })
-          .then(() => resolve({ result: user.d && user.d === d ? 'OK' : 'WARN : There is another device logged in. That will be logged out.' }))
+          .then(() => resolve({ result: !user.d || user.d === d ? 'OK' : 'WARN : There is another device logged in. That will be logged out.' }))
           .catch(reject);
       }
       return reject('No deviceToken Error.');
