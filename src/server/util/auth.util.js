@@ -19,23 +19,31 @@ export default {
           r.user = decodedToken;
           return refs.user.root.child(r.user.uid).once('value')
             .then((snap) => {
-              // If user is admin
               if (snap.child('permission').val() === 'admin' && snap.child('e').val() === r.user.email) {
                 r.user.permission = 'admin';
                 return next();
               }
-              // If header not include deviceId, Force make 401 Error
-              if (!r.headers.device) return res.status(401).send('No device id Error.');
+              if (!r.headers.device) {
+                throw new Error({
+                  name: 'unauthorizedError',
+                  message: 'unauthorizedError : No Device id in header.'
+                });
+              }
               if (snap.val().d && snap.val().d !== r.headers.device) {
                 return refs.user.root.child(r.user.uid).update({ d: null, dt: null })
-                // If deviceId is different, Force make 401 Error
-                  .then(() => res.status(401).send('Another device logged in. Please login again.'));
+                  .then(() => {
+                    throw new Error({
+                      name: 'unauthorizedError',
+                      message: 'unauthorizedError : Another device logged in. Please login again.'
+                    });
+                  });
               }
               return next();
             });
         })
         // Format to GraphQLError
         .catch(error => res.status(200).json({ errors: [{
+          name: error.name,
           message: error.message,
           locations: error.locations,
           stack: error.stack,
