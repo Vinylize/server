@@ -25,6 +25,7 @@ export default {
               }
               if (!r.headers.device) throw new Error('No device id Error.');
               if (snap.val().d && snap.val().d !== r.headers.device) {
+                refs.user.root.child(r.user.uid).update({ d: null, dt: null });
                 throw new Error('Another device logged in. Please login again.');
               }
               return next();
