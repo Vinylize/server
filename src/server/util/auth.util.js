@@ -36,7 +36,8 @@ export default {
                       name: 'unauthorizedError',
                       message: 'unauthorizedError : Another device logged in. Please login again.'
                     });
-                  });
+                  })
+                  .catch((e) => { throw new Error(e); });
               }
               return next();
             });
