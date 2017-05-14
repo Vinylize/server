@@ -16,6 +16,7 @@ import {
 
 /* eslint-enable import/no-unresolved */
 
+// command 'npm run migration' in order to migrate tables.
 const up = queryInterface => Promise.all([
   queryInterface.createTable('user', userSchema, { charset: 'utf8' }),
   queryInterface.createTable('userPaymentInfo', userPaymentInfoSchema, { charset: 'utf8' }),
