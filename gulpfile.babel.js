@@ -5,6 +5,7 @@ import gulp from 'gulp';
 import nodemon from 'gulp-nodemon';
 import istanbul from 'gulp-istanbul';
 import mocha from 'gulp-mocha';
+import rename from 'gulp-rename';
 import rimraf from 'rimraf';
 import sourcemaps from 'gulp-sourcemaps';
 
@@ -13,8 +14,12 @@ const SOURCE = {
   SERVER: 'src/server/**/*.js',
   SHARED: 'src/shared/**/*.js',
   TEST: 'src/test/**/*.js',
+  SCHEMA: 'src/server/util/sequelize/sequelize.schema.js',
+  MIGRATION: 'src/server/util/sequelize/sequelize.migration.js',
   DIST: 'dist',
-  DIST_TEST: 'dist-test'
+  DIST_TEST: 'dist-test',
+  DIST_SCHEMA: './migration/schema',
+  DIST_MIGRATION: './migration/migrations'
 };
 
 gulp.task('dev', ['build'], () => {
@@ -68,5 +73,20 @@ gulp.task('build:test', ['clean:test'], () => gulp.src(SOURCE.ALL)
   .pipe(sourcemaps.write())
   .pipe(gulp.dest(SOURCE.DIST_TEST)));
 
+gulp.task('build:migration', ['clean:migration', 'build:schema'], () => gulp.src(SOURCE.MIGRATION)
+  .pipe(sourcemaps.init())
+  .pipe(babel())
+  .pipe(sourcemaps.write())
+  .pipe(rename(`${Date.now()}migration.js`))
+  .pipe(gulp.dest(SOURCE.DIST_MIGRATION)));
+
+gulp.task('build:schema', () => gulp.src(SOURCE.SCHEMA)
+  .pipe(sourcemaps.init())
+  .pipe(babel())
+  .pipe(sourcemaps.write())
+  .pipe(gulp.dest(SOURCE.DIST_SCHEMA)));
+
+
 gulp.task('clean', () => rimraf.sync(SOURCE.DIST));
 gulp.task('clean:test', () => rimraf.sync(SOURCE.DIST_TEST));
+gulp.task('clean:migration', () => rimraf.sync(SOURCE.DIST_MIGRATION));

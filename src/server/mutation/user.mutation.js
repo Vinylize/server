@@ -16,6 +16,10 @@ import {
   refs
 } from '../util/firebase/firebase.database.util';
 
+import {
+  mRefs
+} from '../util/sequelize/sequelize.database.util';
+
 import smsUtil from '../util/sms.util';
 import {
   iamportCreateSubscribePayment,
@@ -62,6 +66,14 @@ const createUserMutation = {
             .then(() => refs.user.runnerQualification.child(createdUser.uid).set({
               ...defaultSchema.user.runnerQualification
             })))
+        // CREATE user in mysql-server
+        .then(() => {
+          mRefs.user.root.create({
+            e,
+            n,
+            pw: bcrypt.hashSync(pw, saltRounds),
+          });
+        })
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
   })

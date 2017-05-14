@@ -6,7 +6,8 @@
   "scripts": {
     "test": "gulp test",
     "start": "gulp server",
-    "lint": "eslint --ignore-path .gitignore src"
+    "lint": "eslint --ignore-path .gitignore src",
+    "migration": "gulp build:migration && ./node_modules/.bin/sequelize db:migrate --config ./sequelize.config.json --migrations-path ./migration/migrations"
   },
   "pre-commit": [
     "lint"
@@ -39,18 +40,23 @@
     "gulp-istanbul": "^1.1.1",
     "gulp-mocha": "^4.3.0",
     "iamport": "^0.3.4",
+    "jsonwebtoken": "^7.4.0",
     "lokka": "^1.7.0",
     "lokka-transport-http": "^1.6.1",
     "mailgun-js": "^0.10.1",
     "method-override": "^2.3.7",
     "morgan": "^1.7.0",
     "multer": "^1.3.0",
+    "mysql": "^2.13.0",
+    "mysql2": "^1.2.0",
     "node-env-file": "^0.1.8",
     "path": "^0.12.7",
     "raven": "^1.2.1",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
     "run-sequence": "^1.2.2",
+    "sequelize": "^3.30.4",
+    "sequelize-cli": "^2.7.0",
     "twilio": "^2.11.1",
     "winston": "^2.3.1"
   },
@@ -72,6 +78,7 @@
     "gulp-cli": "^1.2.2",
     "gulp-concat": "^2.6.1",
     "gulp-nodemon": "^2.2.1",
+    "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.9.1",
     "pre-commit": "^1.2.2",
     "rimraf": "^2.5.4"
