@@ -2,22 +2,22 @@
   "development": {
     "username": "yettamaster",
     "password": "yettayetta",
-    "database": "yetta",
-    "host": "dev0.cluster-c9pskhejjc26.ap-northeast-2.rds.amazonaws.com",
+    "database": "yetta_dev",
+    "host": "mysql-dev-yetta.c9pskhejjc26.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql"
   },
   "test": {
     "username": "yettamaster",
     "password": "yettayetta",
-    "database": "yetta",
-    "host": "dev0.cluster-c9pskhejjc26.ap-northeast-2.rds.amazonaws.com",
+    "database": "yetta_dev",
+    "host": "mysql-dev-yetta.c9pskhejjc26.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql"
   },
   "production": {
     "username": "yettamaster",
     "password": "yettayetta",
-    "database": "yetta",
-    "host": "dev0.cluster-c9pskhejjc26.ap-northeast-2.rds.amazonaws.com",
+    "database": "yetta_dev",
+    "host": "mysql-dev-yetta.c9pskhejjc26.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql"
   }
 }

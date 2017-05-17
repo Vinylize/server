@@ -1,299 +1,175 @@
 import Sequelize from 'sequelize';
 
-const userSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
+const schema = {
+  user: {
+    root_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    e: { v: { type: Sequelize.STRING } },
+    pw: { v: { type: Sequelize.STRING } },
+    n: { v: { type: Sequelize.STRING } },
+    mode: { v: { type: Sequelize.INTEGER } },
+    idUrl: { v: { type: Sequelize.STRING } },
+    pUrl: { v: { type: Sequelize.STRING } },
+    p: { v: { type: Sequelize.STRING } },
+    isPV: { v: { type: Sequelize.BOOLEAN } },
+    cAt: { v: { type: Sequelize.DATE } },
+    r: { v: { type: Sequelize.INTEGER } },
+    dt: { v: { type: Sequelize.STRING } },
+    d: { v: { type: Sequelize.STRING } },
+    isWJ: { v: { type: Sequelize.BOOLEAN } },
+    isRA: { v: { type: Sequelize.BOOLEAN } },
+    rAAt: { v: { type: Sequelize.INTEGER } },
+    isB: { v: { type: Sequelize.BOOLEAN } },
+    permission: { v: { type: Sequelize.STRING } },
+    isUA: { v: { type: Sequelize.BOOLEAN } },
+    uAAt: { v: { type: Sequelize.DATE } },
+    isSA: { v: { type: Sequelize.BOOLEAN } },
+    sAAt: { v: { type: Sequelize.DATE } },
+    lat: { v: { type: Sequelize.FLOAT } },
+    lon: { v: { type: Sequelize.FLOAT } },
+    code: { v: { type: Sequelize.STRING } },
+    vAt: { v: { type: Sequelize.DATE } },
+    eAt: { v: { type: Sequelize.DATE } }
   },
-  e: { type: Sequelize.STRING },
-  pw: { type: Sequelize.STRING },
-  n: { type: Sequelize.STRING },
-  mode: { type: Sequelize.INTEGER },
-  idUrl: { type: Sequelize.STRING },
-  pUrl: { type: Sequelize.STRING },
-  p: { type: Sequelize.STRING },
-  isPV: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false
+  userPaymentInfo: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    type: { v: { type: Sequelize.STRING } },
+    num: { v: { type: Sequelize.STRING } },
+    provider: { v: { type: Sequelize.STRING } }
   },
-  cAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
+  runnerPaymentInfo: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    type: { v: { type: Sequelize.STRING } },
+    num: { v: { type: Sequelize.STRING } },
+    provider: { v: { type: Sequelize.STRING } }
   },
-  r: {
-    type: Sequelize.INTEGER,
-    defaultValue: 5
+  userAddress: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    name: { v: { type: Sequelize.STRING } },
+    mAddr: { v: { type: Sequelize.STRING } },
+    sAddr: { v: { type: Sequelize.STRING } },
+    lat: { v: { type: Sequelize.FLOAT } },
+    lon: { v: { type: Sequelize.FLOAT } }
   },
-  dt: { type: Sequelize.STRING },
-  isWJ: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
+  help: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    comm: { v: { type: Sequelize.STRING } },
+    cAt: { v: { type: Sequelize.DATE } },
+    aAt: { v: { type: Sequelize.DATE } },
+    ans: { v: { type: Sequelize.STRING } },
+    ansAt: { v: { type: Sequelize.DATE } }
   },
-  isRA: { type: Sequelize.BOOLEAN },
-  rAAt: { type: Sequelize.INTEGER },
-  isB: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
+  order: {
+    root_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    oId: { v: { type: Sequelize.STRING } },
+    rId: { v: { type: Sequelize.STRING } },
+    nId: { v: { type: Sequelize.STRING } },
+    dest: { v: { type: Sequelize.STRING } },
+    dC: { v: { type: Sequelize.INTEGER } },
+    rC: { v: { type: Sequelize.INTEGER } },
+    rImg: { v: { type: Sequelize.STRING } },
+    eDp: { v: { type: Sequelize.INTEGER } },
+    rDp: { v: { type: Sequelize.INTEGER } },
+    isIC: { v: { type: Sequelize.BOOLEAN } },
+    tP: { v: { type: Sequelize.INTEGER } },
+    curr: { v: { type: Sequelize.STRING } },
+    cAt: { v: { type: Sequelize.DATE } },
+    pSAt: { v: { type: Sequelize.DATE } },
+    pFAt: { v: { type: Sequelize.DATE } },
+    rSAt: { v: { type: Sequelize.DATE } },
+    endAt: { v: { type: Sequelize.DATE } },
+    n1: { v: { type: Sequelize.STRING } },
+    n2: { v: { type: Sequelize.STRING } },
+    lat: { v: { type: Sequelize.FLOAT } },
+    lon: { v: { type: Sequelize.FLOAT } },
+    calculateDetail: { v: { type: Sequelize.STRING } },
+    paymentDetail: { v: { type: Sequelize.STRING } },
+    rM: { v: { type: Sequelize.INTEGER } },
+    rComm: { v: { type: Sequelize.STRING } },
+    uM: { v: { type: Sequelize.INTEGER } },
+    uComm: { v: { type: Sequelize.STRING } }
   },
-  permission: { type: Sequelize.STRING },
-  isUA: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
+  regItems: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    n: { v: { type: Sequelize.STRING } },
+    p: { v: { type: Sequelize.INTEGER } },
+    cnt: { v: { type: Sequelize.INTEGER } }
   },
-  uAAt: { type: Sequelize.DATE },
-  isSA: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false
+  customItems: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    n: { v: { type: Sequelize.STRING } },
+    manu: { v: { type: Sequelize.STRING } },
+    cnt: { v: { type: Sequelize.INTEGER } }
   },
-  sAAt: { type: Sequelize.DATE },
-  lat: { type: Sequelize.FLOAT },
-  lon: { type: Sequelize.FLOAT },
-  code: { type: Sequelize.STRING },
-  vAt: { type: Sequelize.DATE },
-  eAt: { type: Sequelize.DATE }
+  node: {
+    root_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    n: { v: { type: Sequelize.STRING } },
+    p: { v: { type: Sequelize.STRING } },
+    addr: { v: { type: Sequelize.STRING } },
+    c1: { v: { type: Sequelize.STRING } },
+    c2: { v: { type: Sequelize.STRING } },
+    type: { v: { type: Sequelize.STRING } },
+    pId: { v: { type: Sequelize.STRING } },
+    imgUrl: { v: { type: Sequelize.STRING } },
+    cAt: { v: { type: Sequelize.DATE } },
+    like: { v: { type: Sequelize.INTEGER } },
+    lat: { v: { type: Sequelize.FLOAT } },
+    lon: { v: { type: Sequelize.FLOAT } }
+  },
+  nodeItems: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    name: { v: { type: Sequelize.STRING } },
+    imgUrl: { v: { type: Sequelize.STRING } },
+    price: { v: { type: Sequelize.INTEGER } },
+    weight: { v: { type: Sequelize.INTEGER } }
+  },
+  partner: {
+    root_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    pw: { v: { type: Sequelize.STRING } },
+    name: { v: { type: Sequelize.STRING } },
+    p: { v: { type: Sequelize.STRING } },
+    cAt: { v: { type: Sequelize.DATE } },
+    isA: { v: { type: Sequelize.BOOLEAN } },
+    AAt: { v: { type: Sequelize.DATE } },
+    isFA: { v: { type: Sequelize.BOOLEAN } },
+    FAAt: { v: { type: Sequelize.DATE } }
+  },
+  partnerPaymentInfo: {
+    sub_id: { v: { type: Sequelize.UUID, unique: true, allowNull: false } },
+    type: { v: { type: Sequelize.INTEGER } },
+    num: { v: { type: Sequelize.STRING } },
+    provider: { v: { type: Sequelize.STRING } }
+  }
 };
 
-const userPaymentInfoSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  type: { type: Sequelize.STRING },
-  num: { type: Sequelize.STRING },
-  provider: { type: Sequelize.STRING },
-  uId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'user',
-      key: 'id'
+/* eslint-disable array-callback-return */
+Object.keys(schema).map((key1) => {
+  Object.keys(schema[key1]).map((key2) => {
+    schema[key1][key2].id = {
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    };
+    if (key1 === 'user' || key1 === 'order' || key1 === 'node' || key1 === 'partner') {
+      if (key2 !== 'root_id') {
+        schema[key1][key2].root_id = {
+          type: Sequelize.UUID,
+          primaryKey: true
+        };
+      }
+    } else {
+      schema[key1][key2].root_id = {
+        type: Sequelize.UUID,
+        allowNull: false
+      };
+      if (key2 !== 'sub_id') {
+        schema[key1][key2].sub_id = {
+          type: Sequelize.UUID,
+          primaryKey: true
+        };
+      }
     }
-  }
-};
+  });
+});
+/* eslint-enable array-callback-return */
 
-const runnerPaymentInfoSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  type: { type: Sequelize.STRING },
-  num: { type: Sequelize.STRING },
-  provider: { type: Sequelize.STRING },
-  uId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'user',
-      key: 'id'
-    }
-  }
-};
-
-const userAddressSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  name: { type: Sequelize.STRING },
-  mAddr: { type: Sequelize.STRING },
-  sAddr: { type: Sequelize.STRING },
-  lat: { type: Sequelize.FLOAT },
-  lon: { type: Sequelize.FLOAT },
-  uId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'user',
-      key: 'id'
-    }
-  }
-};
-
-const helpSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  comm: { type: Sequelize.STRING },
-  cAt: { type: Sequelize.DATE },
-  aAt: { type: Sequelize.DATE },
-  ans: { type: Sequelize.STRING },
-  ansAt: { type: Sequelize.DATE },
-  uId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'user',
-      key: 'id'
-    }
-  }
-};
-
-const orderSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  oId: { type: Sequelize.STRING },
-  rId: { type: Sequelize.STRING },
-  nId: { type: Sequelize.STRING },
-  dest: { type: Sequelize.STRING },
-  dC: { type: Sequelize.INTEGER },
-  rC: { type: Sequelize.INTEGER },
-  rImg: { type: Sequelize.STRING },
-  eDp: { type: Sequelize.INTEGER },
-  rDp: { type: Sequelize.INTEGER },
-  isIC: { type: Sequelize.BOOLEAN },
-  tP: { type: Sequelize.INTEGER },
-  curr: { type: Sequelize.STRING },
-  cAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
-  },
-  pSAt: { type: Sequelize.DATE },
-  pFAt: { type: Sequelize.DATE },
-  rSAt: { type: Sequelize.DATE },
-  endAt: { type: Sequelize.DATE },
-  mAddr: { type: Sequelize.STRING },
-  sAddr: { type: Sequelize.STRING },
-  lat: { type: Sequelize.FLOAT },
-  lon: { type: Sequelize.FLOAT },
-  calculateDetail: { type: Sequelize.STRING },
-  paymentDetail: { type: Sequelize.STRING },
-  rM: { type: Sequelize.INTEGER },
-  rComm: { type: Sequelize.STRING },
-  uM: { type: Sequelize.INTEGER },
-  uComm: { type: Sequelize.STRING }
-};
-
-const regItemsSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  iId: { type: Sequelize.STRING },
-  n: { type: Sequelize.STRING },
-  p: { type: Sequelize.INTEGER },
-  cnt: { type: Sequelize.INTEGER },
-  oId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'order',
-      key: 'id'
-    }
-  }
-};
-
-const customItemsSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  n: { type: Sequelize.STRING },
-  manu: { type: Sequelize.STRING },
-  cnt: { type: Sequelize.INTEGER },
-  oId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'order',
-      key: 'id'
-    }
-  }
-};
-
-const nodeSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  n: { type: Sequelize.STRING },
-  p: { type: Sequelize.STRING },
-  addr: { type: Sequelize.STRING },
-  c1: { type: Sequelize.STRING },
-  c2: { type: Sequelize.STRING },
-  type: { type: Sequelize.STRING },
-  pId: { type: Sequelize.STRING },
-  imgUrl: { type: Sequelize.STRING },
-  cAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
-  },
-  like: {
-    type: Sequelize.INTEGER,
-    defaultValue: 0
-  },
-  lat: { type: Sequelize.FLOAT },
-  lon: { type: Sequelize.FLOAT },
-};
-
-const nodeItemsSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  name: { type: Sequelize.STRING },
-  imgUrl: { type: Sequelize.STRING },
-  price: { type: Sequelize.INTEGER },
-  weight: { type: Sequelize.INTEGER },
-  nId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'node',
-      key: 'id'
-    }
-  }
-};
-
-const partnerSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  pw: { type: Sequelize.STRING },
-  name: { type: Sequelize.STRING },
-  p: { type: Sequelize.STRING },
-  cAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
-  }
-};
-
-const partnerPaymentInfoSchema = {
-  id: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV1,
-    primaryKey: true
-  },
-  type: { type: Sequelize.INTEGER },
-  num: { type: Sequelize.STRING },
-  provider: { type: Sequelize.STRING },
-  pId: {
-    type: Sequelize.UUID,
-    references: {
-      model: 'partner',
-      key: 'id'
-    }
-  }
-};
-
-export {
-  userSchema,
-  userPaymentInfoSchema,
-  runnerPaymentInfoSchema,
-  userAddressSchema,
-  helpSchema,
-  orderSchema,
-  regItemsSchema,
-  customItemsSchema,
-  nodeSchema,
-  nodeItemsSchema,
-  partnerSchema,
-  partnerPaymentInfoSchema
-};
+export default schema;

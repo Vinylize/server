@@ -11,6 +11,11 @@ import {
 } from '../util/firebase/firebase.database.util';
 
 import {
+  mRefs,
+  updateData
+} from '../util/sequelize/sequelize.database.util';
+
+import {
   mailType,
   sendMail
 } from '../util/mail.util';
@@ -42,6 +47,8 @@ const adminApproveRunnerFirstJudgeMutation = {
         isRA: true,
         rAAt: Date.now()
       })
+      // mysql
+      .then(() => updateData(mRefs.user.root, { isWJ: false, isRA: true, rAAt: Date.now() }, { where: { id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -76,6 +83,7 @@ const adminDisapproveRunnerFirstJudgeMutation = {
         rAAt: null
         // A 'Reason' of disapproving runner can be added
       })
+      .then(() => updateData(mRefs.user.root, { isWJ: false, isRA: false, rAAt: null }, { where: { id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -99,6 +107,8 @@ const adminDisapproveRunnerMutation = {
         isRA: false,
         rAAt: null
       })
+      // mysql
+      .then(() => updateData(mRefs.user.root, { isWJ: false, isRA: false, rAAt: null }, { where: { id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -118,6 +128,7 @@ const adminBlockUserMutation = {
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
       return refs.user.root.child(uid).child('isB').set(true)
+      .then(() => updateData(mRefs.user.root, { isB: true }, { where: { id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -137,6 +148,7 @@ const adminUnblockUserMutation = {
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
       return refs.user.root.child(uid).child('isB').set(false)
+      .then(() => updateData(mRefs.user.root, { isB: false }, { where: { id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }

@@ -102,6 +102,7 @@ firebaseProd.json
 dist
 dist-test
 migration
+seeders
 
 .vscode
 
