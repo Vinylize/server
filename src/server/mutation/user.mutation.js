@@ -20,7 +20,7 @@ import {
   mRefs,
   mDefaultSchema,
   createData,
-  updateData,
+  updateData
 } from '../util/sequelize/sequelize.database.util';
 
 import smsUtil from '../util/sms.util';
@@ -55,31 +55,31 @@ const createUserMutation = {
       displayName: n,
       disabled: false
     })
-        .then(createdUser => refs.user.root.child(createdUser.uid).set({
-          id: createdUser.uid,
+      .then(createdUser => refs.user.root.child(createdUser.uid).set({
+        id: createdUser.uid,
+        e,
+        n,
+        pw: bcrypt.hashSync(pw, saltRounds),
+        cAt: Date.now(),
+        ...defaultSchema.user.root
+      })
+        .then(() => refs.user.userQualification.child(createdUser.uid).set({
+          ...defaultSchema.user.orderQualification
+        }))
+        .then(() => refs.user.runnerQualification.child(createdUser.uid).set({
+          ...defaultSchema.user.runnerQualification
+        }))
+        // mysql
+        .then(() => createData(mRefs.user.root, {
           e,
           n,
           pw: bcrypt.hashSync(pw, saltRounds),
           cAt: Date.now(),
-          ...defaultSchema.user.root
-        })
-            .then(() => refs.user.userQualification.child(createdUser.uid).set({
-              ...defaultSchema.user.orderQualification
-            }))
-            .then(() => refs.user.runnerQualification.child(createdUser.uid).set({
-              ...defaultSchema.user.runnerQualification
-            }))
-            // mysql
-            .then(() => createData(mRefs.user.root, {
-              e,
-              n,
-              pw: bcrypt.hashSync(pw, saltRounds),
-              cAt: Date.now(),
-              ...mDefaultSchema.user.root
-            }))
-        )
-        .then(() => resolve({ result: 'OK' }))
-        .catch(reject);
+          ...mDefaultSchema.user.root
+        }))
+      )
+      .then(() => resolve({ result: 'OK' }))
+      .catch(reject);
   })
 };
 
@@ -98,7 +98,7 @@ const userSignInMutation = {
       if (dt !== undefined && dt !== 'undefined') {
         return refs.user.root.child(user.uid).update({ dt, d })
         // mysql
-          .then(() => updateData(mRefs.user.root, { dt, d }, { where: { root_id: user.uid } }))
+          .then(() => updateData(mRefs.user.root, { dt, d }, { where: { row_id: user.uid } }))
           .then(() => resolve({ result: user.d && user.d === d ? 'OK' : 'WARN : There is another device logged in. That will be logged out.' }))
           .catch(reject);
       }
@@ -119,7 +119,7 @@ const userSignOutMutation = {
     if (user) {
       return refs.user.root.child(user.uid).update({ dt: null, d: null })
           // mysql
-          .then(() => updateData(mRefs.user.root, { dt: null, d: null }, { where: { root_id: user.uid } }))
+          .then(() => updateData(mRefs.user.root, { dt: null, d: null }, { where: { row_id: user.uid } }))
           .then(() => resolve({ result: 'OK' }))
           .catch(reject);
     }
@@ -142,7 +142,7 @@ const userUpdateNameMutation = {
   mutateAndGetPayload: ({ n }, { user }) => new Promise((resolve, reject) =>
     refs.user.root.child(user.uid).child('n').set(n)
     // mysql
-    .then(() => updateData(mRefs.user.root, { n }, { where: { root_id: user.uid } }))
+    .then(() => updateData(mRefs.user.root, { n }, { where: { row_id: user.uid } }))
       .then(resolve({ result: 'OK' }))
       .catch(reject))
 };
@@ -164,14 +164,14 @@ const userRequestPhoneVerifiactionMutation = {
       // return updateData(mRefs.user, {
       //   code,
       //   eAt: Date.now() + (120 * 1000)
-      // }, { where: { root_id: user.uid } })
+      // }, { where: { row_id: user.uid } })
       return refs.user.phoneVerificationInfo.child(user.uid).set({
         code,
         eAt: Date.now() + (120 * 1000)
       })
           .then(() => refs.user.root.child(user.uid).child('p').set(p))
           // mysql
-          .then(() => updateData(mRefs.user, { p }, { where: { root_id: user.uid } }))
+          .then(() => updateData(mRefs.user, { p }, { where: { row_id: user.uid } }))
           .then(() => resolve({ result: 'OK' }))
           .catch(reject);
     }
@@ -215,7 +215,7 @@ const userResponsePhoneVerificationMutation = {
         .then(() => refs.user.root.child(user.uid).child('isPV').set(true))
         .then(() => refs.user.phoneVerificationInfo.child(user.uid).child('vAt').set(Date.now()))
         // mysql
-        .then(() => updateData(mRefs.user, 'root', { isPv: true, vAt: Date.now() }, { where: { root_id: user.uid } }))
+        .then(() => updateData(mRefs.user, 'root', { isPv: true, vAt: Date.now() }, { where: { row_id: user.uid } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }
@@ -238,7 +238,7 @@ const userAgreeMutation = {
         aAt: Date.now()
       })
       // mysql
-      .then(() => updateData(mRefs.user, 'root', { isA: true, aAt: Date.now() }, { where: { root_id: user.uid } }))
+      .then(() => updateData(mRefs.user, 'root', { isA: true, aAt: Date.now() }, { where: { row_id: user.uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -275,7 +275,7 @@ const userAddAddressMutation = {
         sAddr,
         lat,
         lon
-      }, user.uid))
+      }, '5d356c10-3d11-11e7-9ad1-77c411db57c7'))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -296,7 +296,7 @@ const userSetModeMutation = {
     if (user) {
       return refs.user.root.child(user.uid).child('mode').set(mode)
         // mysql
-        .then(() => updateData(mRefs.user, 'root', { mode }, { where: { root_id: user.uid } }))
+        .then(() => updateData(mRefs.user, 'root', { mode }, { where: { row_id: user.uid } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }
@@ -317,7 +317,7 @@ const userSetRunnerModeMutation = {
     if (user) {
       return refs.user.root.child(user.uid).child('rMode').set(rMode)
         // mysql
-        .then(() => updateData(mRefs.user, 'root', { rMode }, { where: { root_id: user.uid } }))
+        .then(() => updateData(mRefs.user, 'root', { rMode }, { where: { row_id: user.uid } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }

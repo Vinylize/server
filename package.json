@@ -7,7 +7,7 @@
     "test": "gulp test",
     "start": "gulp server",
     "lint": "eslint --ignore-path .gitignore src",
-    "migration": "gulp build:migration && ./node_modules/.bin/sequelize db:migrate --config ./sequelize.config.json --migrations-path ./migration/migrations"
+    "migration": "gulp build:migration && node ./migration/sequelize.migration.js up"
   },
   "pre-commit": [
     "lint"

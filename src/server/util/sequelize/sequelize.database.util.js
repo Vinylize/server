@@ -1,12 +1,189 @@
 import Sequelize from 'sequelize';
 import uuid from 'uuid';
-import schema from './sequelize.schema';
+import envFile from 'node-env-file';
 
+const schema = {
+  user: {
+    root: {
+      row_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      e: { v: { type: Sequelize.STRING } },
+      pw: { v: { type: Sequelize.STRING } },
+      n: { v: { type: Sequelize.STRING } },
+      mode: { v: { type: Sequelize.INTEGER } },
+      idUrl: { v: { type: Sequelize.STRING } },
+      pUrl: { v: { type: Sequelize.STRING } },
+      p: { v: { type: Sequelize.STRING } },
+      isPV: { v: { type: Sequelize.BOOLEAN } },
+      cAt: { v: { type: Sequelize.DATE } },
+      r: { v: { type: Sequelize.INTEGER } },
+      dt: { v: { type: Sequelize.STRING } },
+      d: { v: { type: Sequelize.STRING } },
+      isWJ: { v: { type: Sequelize.BOOLEAN } },
+      isRA: { v: { type: Sequelize.BOOLEAN } },
+      rAAt: { v: { type: Sequelize.INTEGER } },
+      isB: { v: { type: Sequelize.BOOLEAN } },
+      permission: { v: { type: Sequelize.STRING } },
+      isUA: { v: { type: Sequelize.BOOLEAN } },
+      uAAt: { v: { type: Sequelize.DATE } },
+      isSA: { v: { type: Sequelize.BOOLEAN } },
+      sAAt: { v: { type: Sequelize.DATE } },
+      lat: { v: { type: Sequelize.FLOAT } },
+      lon: { v: { type: Sequelize.FLOAT } },
+      code: { v: { type: Sequelize.STRING } },
+      vAt: { v: { type: Sequelize.DATE } },
+      eAt: { v: { type: Sequelize.DATE } }
+    },
+    userPaymentInfo: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      type: { v: { type: Sequelize.STRING } },
+      num: { v: { type: Sequelize.STRING } },
+      provider: { v: { type: Sequelize.STRING } }
+    },
+    runnerPaymentInfo: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      type: { v: { type: Sequelize.STRING } },
+      num: { v: { type: Sequelize.STRING } },
+      provider: { v: { type: Sequelize.STRING } }
+    },
+    userAddress: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      name: { v: { type: Sequelize.STRING } },
+      mAddr: { v: { type: Sequelize.STRING } },
+      sAddr: { v: { type: Sequelize.STRING } },
+      lat: { v: { type: Sequelize.FLOAT } },
+      lon: { v: { type: Sequelize.FLOAT } }
+    },
+    help: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      comm: { v: { type: Sequelize.STRING } },
+      cAt: { v: { type: Sequelize.DATE } },
+      aAt: { v: { type: Sequelize.DATE } },
+      ans: { v: { type: Sequelize.STRING } },
+      ansAt: { v: { type: Sequelize.DATE } }
+    }
+  },
+  order: {
+    root: {
+      row_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      oId: { v: { type: Sequelize.STRING } },
+      rId: { v: { type: Sequelize.STRING } },
+      nId: { v: { type: Sequelize.STRING } },
+      dest: { v: { type: Sequelize.STRING } },
+      dC: { v: { type: Sequelize.INTEGER } },
+      rC: { v: { type: Sequelize.INTEGER } },
+      rImg: { v: { type: Sequelize.STRING } },
+      eDp: { v: { type: Sequelize.INTEGER } },
+      rDp: { v: { type: Sequelize.INTEGER } },
+      isIC: { v: { type: Sequelize.BOOLEAN } },
+      tP: { v: { type: Sequelize.INTEGER } },
+      curr: { v: { type: Sequelize.STRING } },
+      cAt: { v: { type: Sequelize.DATE } },
+      pSAt: { v: { type: Sequelize.DATE } },
+      pFAt: { v: { type: Sequelize.DATE } },
+      rSAt: { v: { type: Sequelize.DATE } },
+      endAt: { v: { type: Sequelize.DATE } },
+      n1: { v: { type: Sequelize.STRING } },
+      n2: { v: { type: Sequelize.STRING } },
+      lat: { v: { type: Sequelize.FLOAT } },
+      lon: { v: { type: Sequelize.FLOAT } },
+      calculateDetail: { v: { type: Sequelize.STRING } },
+      paymentDetail: { v: { type: Sequelize.STRING } },
+      rM: { v: { type: Sequelize.INTEGER } },
+      rComm: { v: { type: Sequelize.STRING } },
+      uM: { v: { type: Sequelize.INTEGER } },
+      uComm: { v: { type: Sequelize.STRING } }
+    },
+    regItems: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      n: { v: { type: Sequelize.STRING } },
+      p: { v: { type: Sequelize.INTEGER } },
+      cnt: { v: { type: Sequelize.INTEGER } }
+    },
+    customItems: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      n: { v: { type: Sequelize.STRING } },
+      manu: { v: { type: Sequelize.STRING } },
+      cnt: { v: { type: Sequelize.INTEGER } }
+    }
+  },
+  node: {
+    root: {
+      row_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      n: { v: { type: Sequelize.STRING } },
+      p: { v: { type: Sequelize.STRING } },
+      addr: { v: { type: Sequelize.STRING } },
+      c1: { v: { type: Sequelize.STRING } },
+      c2: { v: { type: Sequelize.STRING } },
+      type: { v: { type: Sequelize.STRING } },
+      pId: { v: { type: Sequelize.STRING } },
+      imgUrl: { v: { type: Sequelize.STRING } },
+      cAt: { v: { type: Sequelize.DATE } },
+      like: { v: { type: Sequelize.INTEGER } },
+      lat: { v: { type: Sequelize.FLOAT } },
+      lon: { v: { type: Sequelize.FLOAT } }
+    },
+    nodeItems: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      name: { v: { type: Sequelize.STRING } },
+      imgUrl: { v: { type: Sequelize.STRING } },
+      price: { v: { type: Sequelize.INTEGER } },
+      weight: { v: { type: Sequelize.INTEGER } }
+    }
+  },
+  partner: {
+    root: {
+      row_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      pw: { v: { type: Sequelize.STRING } },
+      name: { v: { type: Sequelize.STRING } },
+      p: { v: { type: Sequelize.STRING } },
+      cAt: { v: { type: Sequelize.DATE } },
+      isA: { v: { type: Sequelize.BOOLEAN } },
+      AAt: { v: { type: Sequelize.DATE } },
+      isFA: { v: { type: Sequelize.BOOLEAN } },
+      FAAt: { v: { type: Sequelize.DATE } }
+    },
+    partnerPaymentInfo: {
+      sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      type: { v: { type: Sequelize.INTEGER } },
+      num: { v: { type: Sequelize.STRING } },
+      provider: { v: { type: Sequelize.STRING } }
+    }
+  }
+};
+
+/* eslint-disable array-callback-return */
+
+// Add id columns for binding tables
+Object.keys(schema).map((key1) => {
+  Object.keys(schema[key1]).map((key2) => {
+    Object.keys(schema[key1][key2]).map((key3) => {
+      schema[key1][key2][key3].id = {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      };
+      if (key2 === 'root') {
+        if (key3 !== 'row_id') schema[key1][key2][key3].row_id = { type: Sequelize.UUID };
+      } else {
+        schema[key1][key2][key3].row_id = { type: Sequelize.UUID };
+        if (key3 !== 'sub_id') schema[key1][key2][key3].sub_id = { type: Sequelize.UUID };
+      }
+    });
+  });
+});
+
+if (!process.env.MYSQL_DATABASE) envFile('./env.dev.list');
 const db = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_PASSWORD, {
   host: process.env.MYSQL_URL,
   port: process.env.MYSQL_PORT,
-  dialect: 'mysql'
+  dialect: 'mysql',
+  define: {
+    charset: 'utf8',
+    timestamps: false
+  },
 });
+
+/* eslint-enable array-callback-return */
 
 const mRefs = {
   user: {
@@ -82,226 +259,181 @@ const mDefaultSchema = {
   }
 };
 
+
+/* eslint-disable array-callback-return */
+
+// Making associations among tables
+Object.keys(schema).map((key1) => {
+  Object.keys(schema[key1]).map((key2) => {
+    Object.keys(schema[key1][key2]).map((key3) => {
+      mRefs[key1][key2][key3] = db.define(`${key1}_${key2}_${key3}`, schema[key1][key2][key3], {
+        timestamps: false,
+        tableName: `${key1}_${key2}_${key3}`,
+        freezeTableName: true
+      });
+    });
+  });
+});
+Object.keys(schema).map((key1) => {
+  Object.keys(schema[key1]).map((key2) => {
+    Object.keys(schema[key1][key2]).map((key3) => {
+      if (schema[key1][key2].row_id) {
+        if (key3 !== 'row_id') {
+          mRefs[key1][key2][key3].belongsTo(mRefs[key1][key2].row_id, { foreignKey: 'row_id', targetKey: 'v' });
+          mRefs[key1][key2].row_id.hasMany(mRefs[key1][key2][key3], { foreignKey: 'row_id', sourceKey: 'v', constraints: false, as: key3 });
+        }
+      } else {
+        if (key3 !== 'sub_id') {
+          mRefs[key1][key2][key3].belongsTo(mRefs[key1][key2].sub_id, { foreignKey: 'sub_id', targetKey: 'v' });
+          mRefs[key1][key2].sub_id.hasMany(mRefs[key1][key2][key3], { foreignKey: 'sub_id', sourceKey: 'v', constraints: false, as: key3 });
+        }
+        mRefs[key1][key2][key3].belongsTo(mRefs[key1].root.row_id, { foreignKey: 'row_id', targetKey: 'v' });
+        mRefs[key1].root.row_id.hasMany(mRefs[key1][key2][key3], { foreignKey: 'row_id', sourceKey: 'v', constraints: false, as: key3 });
+      }
+    });
+  });
+});
+
+/* eslint-enable array-callback-return */
+
+const findDataById = (table, properties, id, idProp) => new Promise((resolve, reject) => {
+  let where = {};
+  const idRoot = table.row_id ? 'row_id' : 'sub_id';
+  let idType = idProp;
+  if (!idProp) idType = idRoot;
+  let attributes = [];
+  if (idRoot === 'row_id') {
+    attributes = [['v', idRoot]];
+    where = { v: id };
+  } else {
+    attributes = ['row_id', ['v', idRoot]];
+    if (idType === 'row_id') where = { row_id: id };
+    else if (idType === 'sub_id') where = { v: id };
+  }
+  return table[idRoot].findAll({
+    attributes,
+    where,
+    include:
+      properties.map((prop) => {
+        const condition = {};
+        condition[idType] = id;
+        if (prop !== idRoot && table[prop]) {
+          return {
+            model: table[prop],
+            as: prop,
+            attributes: [['v', prop]],
+            where: condition,
+            required: false,
+          };
+        }
+        return null;
+      })
+  })
+  .then((results) => {
+    const results2 = [];
+    let temp = {};
+    results.map((item) => {
+      temp = {};
+      temp.row_id = item.dataValues.row_id;
+      if (idRoot === 'sub_id') temp.sub_id = item.dataValues.sub_id;
+      Object.keys(item.dataValues).map((prop) => {
+        if (prop !== 'row_id' && prop !== 'sub_id') {
+          item.dataValues[prop].map((key) => {
+            temp[prop] = key.dataValues[prop];
+            return null;
+          });
+        }
+        return null;
+      });
+      results2.push(temp);
+      return null;
+    });
+    return resolve(results2);
+  })
+  .catch(reject);
+});
+
+const findData = (table, properties, condition) => new Promise((resolve, reject) => {
+  const idRoot = table.row_id ? 'row_id' : 'sub_id';
+  let attributes = [];
+  if (table.row_id) attributes = [['v', idRoot]];
+  else attributes = ['row_id', ['v', idRoot]];
+  if (Object.prototype.hasOwnProperty.call(condition.where, 'row_id') || Object.prototype.hasOwnProperty.call(condition.where, 'sub_id')) {
+    let idType = null;
+    if (Object.prototype.hasOwnProperty.call(condition.where, 'row_id')) idType = 'row_id';
+    if (Object.prototype.hasOwnProperty.call(condition.where, 'sub_id')) idType = 'sub_id';
+    return findDataById(table, properties, condition.where[idType], idType)
+      .then(result => resolve(result))
+      .catch(reject);
+  }
+  return table[idRoot].findAll({
+    attributes,
+    include:
+      Object.keys(condition.where).map((prop) => {
+        if (prop !== idRoot && table[prop]) {
+          return {
+            model: table[prop],
+            as: prop,
+            attributes: [['v', prop]],
+            where: { v: condition.where[prop] },
+            required: true,
+          };
+        }
+        return null;
+      })
+  })
+    .then(results => Promise.all(results.map(result =>
+      findDataById(table, properties, result.dataValues[idRoot])
+      .then(result2 => result2[0])
+    )))
+    .then(result => resolve(result))
+    .catch(reject);
+});
+
 const createData = (table, properties, id) => new Promise((resolve, reject) => {
   const newId = uuid.v1();
-  if (table.root_id) {
-    return db.transaction(t => table.root_id.create({ v: newId }, { transaction: t })
+  if (table.row_id) {
+    return db.transaction(t => table.row_id.create({ v: newId }, { transaction: t })
       .then(() => Promise.all(
         Object.keys(properties).map((key) => {
-          if (table[key]) return table[key].create({ root_id: newId, v: properties[key] }, { transaction: t });
+          if (table[key]) return table[key].create({ row_id: newId, v: properties[key] }, { transaction: t });
           return null;
         })
       )))
       .then(() => resolve(newId))
       .catch(reject);
   }
-  return db.transaction(t => table.sub_id.create({ root_id: id, v: newId }, { transaction: t })
+  return db.transaction(t => table.sub_id.create({ row_id: id, v: newId }, { transaction: t })
     .then(() => Promise.all(
       Object.keys(properties).map((key) => {
-        if (table[key]) return table[key].create({ root_id: id, sub_id: newId, v: properties[key] }, { transaction: t });
+        if (table[key]) return table[key].create({ row_id: id, sub_id: newId, v: properties[key] }, { transaction: t });
         return null;
       })
     ))).then(() => resolve(newId))
     .catch(reject);
 });
 
-const updateData = (table, properties, condition) => new Promise((resolve, reject) => Promise.all(
-    Object.keys(condition.where).map(key => table[key].findAll({ where: { v: condition.where[key] } }))
-  ).then((instances) => {
-    let ids = [];
-    instances.map(a => a.map((val) => {
-      if (table.root_id) {
-        if (val.root_id) ids.push({ root_id: val.root_id });
-        else ids.push({ root_id: val.v });
-      } else if (val.sub_id) ids.push({ root_id: val.root_id, sub_id: val.sub_id });
-      else ids.push({ root_id: val.root_id, sub_id: val.v });
-      return true;
-    }));
-    ids = ids.filter((v, i, self) => i === self.indexOf(v));
-    return db.transaction(t => Promise.all(
-      ids.map(id => Promise.all(
-        Object.keys(properties).map((key) => {
-          if (table.root_id) {
-            return table[key].findOne({ where: { root_id: id.root_id } }, { transaction: t })
-            .then((data) => {
-              if (data) return table[key].update({ v: properties[key] }, { where: { root_id: id.root_id } }, { transaction: t });
-              return table[key].create({ root_id: id.root_id, v: properties[key] }, { transaction: t });
-            });
-          }
-          return table[key].findOne({ where: { sub_id: id.sub_id } }, { transaction: t })
+const updateData = (table, properties, condition) => new Promise((resolve, reject) => findData(table, [], condition)
+  .then(ids => db.transaction(t => Promise.all(
+    ids.map(id => Promise.all(
+      Object.keys(properties).map((key) => {
+        if (table.row_id) {
+          return table[key].findOne({ where: { row_id: id.row_id } }, { transaction: t })
           .then((data) => {
-            if (data) return table[key].update({ v: properties[key] }, { where: { sub_id: id.sub_id } }, { transaction: t });
-            return table[key].create({ root_id: id.root_id, sub_id: id.sub_id, v: properties[key] }, { transaction: t });
+            if (data) return table[key].update({ v: properties[key] }, { where: { row_id: id.row_id } }, { transaction: t });
+            return table[key].create({ row_id: id.row_id, v: properties[key] }, { transaction: t });
           });
-        })
-      )))
-      .then(() => resolve(ids.map(v => Object.assign(v, properties)))));
-  })
-  .catch(reject)
-);
-
-// If array column, searching by sub_id, while root_id for root column.
-const findDataById = (table, properties, id) => new Promise((resolve, reject) => {
-  let idType = 'root_id';
-  if (table.sub_id) idType = 'sub_id';
-  return table[idType].findOne({ where: { v: id } })
-    .then((instance) => {
-      if (instance) {
-        return Promise.all(
-          properties.map((key) => {
-            if (table.root_id) {
-              return table[key].findOne({ where: { root_id: id } })
-              .then((instance2) => {
-                if (instance2) return instance2.dataValues;
-                return null;
-              });
-            }
-            return table[key].findOne({ where: { sub_id: id } })
-            .then((instance2) => {
-              if (instance2) return instance2.dataValues;
-              return null;
-            });
-          })
-        ).then((result) => {
-          const result2 = {};
-          if (table.root_id) {
-            result2.root_id = id;
-          } else {
-            result2.sub_id = id;
-            result2.root_id = result[0].root_id;
-          }
-          properties.map((key, i) => {
-            if (result[i]) result2[key] = result[i].v;
-            return true;
-          });
-          return result2;
+        }
+        return table[key].findOne({ where: { sub_id: id.sub_id } }, { transaction: t })
+        .then((data) => {
+          if (data) return table[key].update({ v: properties[key] }, { where: { sub_id: id.sub_id } }, { transaction: t });
+          return table[key].create({ row_id: id.row_id, sub_id: id.sub_id, v: properties[key] }, { transaction: t });
         });
-      }
-      return reject('No results');
-    })
-    .then(result => resolve(result))
-    .catch(reject);
-});
-
-const findData = (table, properties, condition) => new Promise((resolve, reject) => Promise.all(
-    Object.keys(condition.where).map(key => table[key].findAll({ where: { v: condition.where[key] } }))
-  )
-  .then((instances) => {
-    let ids = [];
-    instances.map((a) => {
-      a.map((v) => {
-        if (table.root_id) ids.push(v.root_id);
-        else ids.push(v.sub_id);
-        return true;
-      });
-      return true;
-    });
-    ids = ids.filter((v, i, self) => i === self.indexOf(v));
-    return Promise.all(
-      ids.map(id => findDataById(table, properties, id))
-    ).then(result => resolve(result));
-  })
-  .catch(reject));
-
-/* eslint-disable array-callback-return */
-
-Object.keys(schema.user).map((key) => {
-  mRefs.user.root[key] = db.define(`user_${key}`, schema.user[key], {
-    timestamps: false,
-    tableName: `user_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.userPaymentInfo).map((key) => {
-  mRefs.user.userPaymentInfo[key] = db.define(`userPaymentInfo_${key}`, schema.userPaymentInfo[key], {
-    timestamps: false,
-    tableName: `userPaymentInfo_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.runnerPaymentInfo).map((key) => {
-  mRefs.user.runnerPaymentInfo[key] = db.define(`runnerPaymentInfo_${key}`, schema.runnerPaymentInfo[key], {
-    timestamps: false,
-    tableName: `runnerPaymentInfo_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.userAddress).map((key) => {
-  mRefs.user.userAddress[key] = db.define(`userAddress_${key}`, schema.userAddress[key], {
-    timestamps: false,
-    tableName: `userAddress_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.help).map((key) => {
-  mRefs.user.help[key] = db.define(`help_${key}`, schema.help[key], {
-    timestamps: false,
-    tableName: `help_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.order).map((key) => {
-  mRefs.order[key] = db.define(`order_${key}`, schema.order[key], {
-    timestamps: false,
-    tableName: `order_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.regItems).map((key) => {
-  mRefs.order.regItems[key] = db.define(`regItems_${key}`, schema.regItems[key], {
-    timestamps: false,
-    tableName: `regItmes_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.customItems).map((key) => {
-  mRefs.order.customItems[key] = db.define(`customItems_${key}`, schema.customItems[key], {
-    timestamps: false,
-    tableName: `customItems_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.node).map((key) => {
-  mRefs.node.root[key] = db.define(`node_${key}`, schema.node[key], {
-    timestamps: false,
-    tableName: `node_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.nodeItems).map((key) => {
-  mRefs.node.nodeItems[key] = db.define(`nodeItems_${key}`, schema.nodeItems[key], {
-    timestamps: false,
-    tableName: `nodeItems_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.partner).map((key) => {
-  mRefs.partner.root[key] = db.define(`partner_${key}`, schema.partner[key], {
-    timestamps: false,
-    tableName: `partner_${key}`,
-    freezeTableName: true
-  });
-});
-
-Object.keys(schema.partnerPaymentInfo).map((key) => {
-  mRefs.partner.partnerPaymentInfo[key] = db.define(`partnerPaymentInfo_${key}`, schema.partnerPaymentInfo[key], {
-    timestamps: false,
-    tableName: `partnerPaymentInfo_${key}`,
-    freezeTableName: true
-  });
-});
-
-/* eslint-enable array-callback-return */
+      })
+    )))
+    .then(() => resolve(ids.map(v => Object.assign(v, properties))))))
+    .catch(reject)
+);
 
 export {
   mRefs,
