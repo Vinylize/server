@@ -22,6 +22,22 @@ import {
   s3Keys,
 } from '../util/s3.util';
 
+function decodeBase64Image(dataString) {
+  /* eslint-disable */
+  const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  /* eslint-enable */
+  const response = {};
+
+  if (matches.length !== 3) {
+    return new Error('Invalid input string');
+  }
+
+  response.type = matches[1];
+  response.data = new Buffer(matches[2], 'base64');
+
+  return response;
+}
+
 const userUploadProfileImageMutation = {
   name: 'userUploadProfileImage',
   description: '',
@@ -29,7 +45,8 @@ const userUploadProfileImageMutation = {
   outputFields: {
     imgUrl: { type: GraphQLString, resolve: payload => payload.imgUrl }
   },
-  mutateAndGetPayload: (args, { user, file }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: (args, { user, body }) => new Promise((resolve, reject) => {
+    const file = decodeBase64Image(body.file);
     if (user) {
       if (file) {
         const key = `${s3Keys.profile}/${user.uid}.png`;
@@ -37,7 +54,7 @@ const userUploadProfileImageMutation = {
           Bucket: s3BucketName,
           Key: key,
           ACL: 'public-read',
-          Body: file.buffer
+          Body: file.data
         };
 
         return s3.putObject(params, (err) => {
@@ -64,7 +81,8 @@ const userUploadIdImageMutation = {
   outputFields: {
     imgUrl: { type: GraphQLString, resolve: payload => payload.imgUrl }
   },
-  mutateAndGetPayload: (args, { user, file }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: (args, { user, body }) => new Promise((resolve, reject) => {
+    const file = decodeBase64Image(body.file);
     if (user) {
       if (file) {
         const key = `${s3Keys.id}/${user.uid}.png`;
@@ -72,7 +90,7 @@ const userUploadIdImageMutation = {
           Bucket: s3BucketName,
           Key: key,
           ACL: 'public-read',
-          Body: file.buffer
+          Body: file.data
         };
 
         return s3.putObject(params, (err) => {

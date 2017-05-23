@@ -119,10 +119,10 @@ const userSignOutMutation = {
   mutateAndGetPayload: ({ dt, d }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       return refs.user.root.child(user.uid).update({ dt: null, d: null })
-          // mysql
-          .then(() => updateData(mRefs.user.root, { dt: null, d: null }, { where: { row_id: user.uid } }))
-          .then(() => resolve({ result: 'OK' }))
-          .catch(reject);
+        // mysql
+        .then(() => updateData(mRefs.user.root, { dt: null, d: null }, { where: { row_id: user.uid } }))
+        .then(() => resolve({ result: 'OK' }))
+        .catch(reject);
     }
     return reject('This mutation needs accessToken.');
   })
@@ -166,15 +166,15 @@ const userRequestPhoneVerifiactionMutation = {
         code,
         eAt: Date.now() + (120 * 1000)
       })
-          .then(() => refs.user.root.child(user.uid).child('p').set(p))
-          // mysql
-          .then(() => updateData(mRefs.user, {
-            p,
-            code,
-            eAt: Date.now() + (120 * 1000)
-          }, { where: { row_id: user.uid } }))
-          .then(() => resolve({ result: 'OK' }))
-          .catch(reject);
+        .then(() => refs.user.root.child(user.uid).child('p').set(p))
+        // mysql
+        .then(() => updateData(mRefs.user, {
+          p,
+          code,
+          eAt: Date.now() + (120 * 1000)
+        }, { where: { row_id: user.uid } }))
+        .then(() => resolve({ result: 'OK' }))
+        .catch(reject);
     }
     return reject('This mutation needs accessToken');
   })
@@ -214,7 +214,7 @@ const userResponsePhoneVerificationMutation = {
             if (users[0].eAt < Date.now()) {
               return reject('time exceeded.');
             }
-            return reject('wrong code.');
+            throw new Error('Wrong code.');
           })
           .then(() => updateData(mRefs.user.root, { isPv: true, vAt: Date.now() }, { where: { row_id: user.uid } }))
         )
