@@ -14,6 +14,7 @@ import {
 
 import {
   mRefs,
+  findDataById,
   updateData
 } from '../util/sequelize/sequelize.database.util';
 
@@ -62,15 +63,15 @@ const runnerApplyFirstJudgeMutation = {
       })
       .then(() => refs.user.root.child(user.uid).child('isWJ').set(true))
       // mysql
-      // return findDataById(mRefs.user.root, ['idUrl', 'isPV', 'isRA'], user.uid)
-      // .then((u) => {
-      //   if (!u.idUrl) return reject('Upload identification image first.');
-      //   if (!u.isPV) return reject('Verify your phone first.');
-      //   if (u.isRA) return reject('You are already a runner.');
-      //   return resolve();
-      // })
-      // mysql
-      .then(() => updateData(mRefs.user.root, { isWJ: true }, { where: { row_id: user.uid } }))
+      .then(() => findDataById(mRefs.user.root, ['idUrl', 'isPV', 'isRA'], user.uid)
+        .then((u) => {
+          if (!u.idUrl) return reject('Upload identification image first.');
+          if (!u.isPV) return reject('Verify your phone first.');
+          if (u.isRA) return reject('You are already a runner.');
+          return resolve();
+        })
+        .then(() => updateData(mRefs.user.root, { isWJ: true }, { where: { row_id: user.uid } }))
+      )
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }

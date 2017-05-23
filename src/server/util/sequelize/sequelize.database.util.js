@@ -393,7 +393,8 @@ const findData = (table, properties, condition) => new Promise((resolve, reject)
 });
 
 const createData = (table, properties, id) => new Promise((resolve, reject) => {
-  const newId = uuid.v1();
+  let newId = uuid.v1();
+  if (id) newId = id;
   if (table.row_id) {
     return db.transaction(t => table.row_id.create({ v: newId }, { transaction: t })
       .then(() => Promise.all(

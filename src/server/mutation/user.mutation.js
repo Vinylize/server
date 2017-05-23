@@ -19,6 +19,7 @@ import {
 import {
   mRefs,
   mDefaultSchema,
+  findDataById,
   createData,
   updateData
 } from '../util/sequelize/sequelize.database.util';
@@ -76,7 +77,7 @@ const createUserMutation = {
           pw: bcrypt.hashSync(pw, saltRounds),
           cAt: Date.now(),
           ...mDefaultSchema.user.root
-        }))
+        }, createdUser.uid))
       )
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
@@ -161,17 +162,17 @@ const userRequestPhoneVerifiactionMutation = {
       const code = smsUtil.getRandomCode();
       smsUtil.sendVerificationMessage(p, code);
       // mysql
-      // return updateData(mRefs.user, {
-      //   code,
-      //   eAt: Date.now() + (120 * 1000)
-      // }, { where: { row_id: user.uid } })
       return refs.user.phoneVerificationInfo.child(user.uid).set({
         code,
         eAt: Date.now() + (120 * 1000)
       })
           .then(() => refs.user.root.child(user.uid).child('p').set(p))
           // mysql
-          .then(() => updateData(mRefs.user, { p }, { where: { row_id: user.uid } }))
+          .then(() => updateData(mRefs.user, {
+            p,
+            code,
+            eAt: Date.now() + (120 * 1000)
+          }, { where: { row_id: user.uid } }))
           .then(() => resolve({ result: 'OK' }))
           .catch(reject);
     }
@@ -191,16 +192,6 @@ const userResponsePhoneVerificationMutation = {
   mutateAndGetPayload: ({ code }, { user }) => new Promise((resolve, reject) => {
     if (user) {
       // mysql
-      // return findDataById(mRefs.user, 'root', { code, eAt }, user.uid)
-      // .then((user) => {
-      //   if (user.code === code && user.eAt > Date.now()) {
-      //     return resolve();
-      //   }
-      //   if (user.eAt < Date.now()) {
-      //     return rejecet('time exceeded.')''
-      //   }
-      //   return reject('wrong code.');
-      // })
       return refs.user.phoneVerificationInfo.child(user.uid).once('value')
         .then((snap) => {
           if (snap.val().code === code && snap.val().eAt > Date.now()) {
@@ -215,7 +206,18 @@ const userResponsePhoneVerificationMutation = {
         .then(() => refs.user.root.child(user.uid).child('isPV').set(true))
         .then(() => refs.user.phoneVerificationInfo.child(user.uid).child('vAt').set(Date.now()))
         // mysql
-        .then(() => updateData(mRefs.user, 'root', { isPv: true, vAt: Date.now() }, { where: { row_id: user.uid } }))
+        .then(() => findDataById(mRefs.user.root, ['code', 'eAt'], { where: { row_id: user.uid } })
+          .then((users) => {
+            if (users[0].code === code && user[0].eAt > Date.now()) {
+              return resolve();
+            }
+            if (users[0].eAt < Date.now()) {
+              return reject('time exceeded.');
+            }
+            return reject('wrong code.');
+          })
+          .then(() => updateData(mRefs.user.root, { isPv: true, vAt: Date.now() }, { where: { row_id: user.uid } }))
+        )
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }
@@ -238,7 +240,7 @@ const userAgreeMutation = {
         aAt: Date.now()
       })
       // mysql
-      .then(() => updateData(mRefs.user, 'root', { isA: true, aAt: Date.now() }, { where: { row_id: user.uid } }))
+      .then(() => updateData(mRefs.user.root, { isA: true, aAt: Date.now() }, { where: { row_id: user.uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -296,7 +298,7 @@ const userSetModeMutation = {
     if (user) {
       return refs.user.root.child(user.uid).child('mode').set(mode)
         // mysql
-        .then(() => updateData(mRefs.user, 'root', { mode }, { where: { row_id: user.uid } }))
+        .then(() => updateData(mRefs.user.root, { mode }, { where: { row_id: user.uid } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }
@@ -317,7 +319,7 @@ const userSetRunnerModeMutation = {
     if (user) {
       return refs.user.root.child(user.uid).child('rMode').set(rMode)
         // mysql
-        .then(() => updateData(mRefs.user, 'root', { rMode }, { where: { row_id: user.uid } }))
+        .then(() => updateData(mRefs.user.root, { rMode }, { where: { row_id: user.uid } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }

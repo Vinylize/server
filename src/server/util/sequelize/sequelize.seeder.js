@@ -9,7 +9,7 @@ const up = () => {
   Object.keys(data).map((table) => {
     if (table === 'user' || table === 'order' || table === 'partner') {
       Object.keys(data[table]).map((key) => {
-        createData(mRefs[table].root, { ...data[table][key] });
+        createData(mRefs[table].root, { ...data[table][key] }, key);
       });
     }
     return null;
@@ -19,7 +19,7 @@ const up = () => {
   Object.keys(coordinates).map((key) => {
     nodes[key].lat = coordinates[key].l[0];
     nodes[key].lon = coordinates[key].l[1];
-    createData(mRefs.node.root, { ...nodes[key] });
+    createData(mRefs.node.root, { ...nodes[key] }, key);
     return null;
   });
 };

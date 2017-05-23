@@ -16,6 +16,14 @@ import {
 } from '../util/firebase/firebase.database.util';
 
 import {
+  mDefaultSchema,
+  mRefs,
+  findDataById,
+  updateData,
+  createData
+} from '../util/sequelize/sequelize.database.util';
+
+import {
   sendOrderAllPush,
   sendOrderCatchPush
 } from '../util/selectivePush.util';
@@ -120,6 +128,24 @@ const userCreateOrderMutation = {
           .then(() => refs.order.customItem.child(newOrderKey).set({
             ...customItems
           }))
+          .then(() => createData(mRefs.order.root, {
+            oId: user.uid,
+            nId,
+            dC,
+            rC,
+            curr,
+            tP,
+            eDP,
+            cAt: Date.now(),
+            ...dest,
+            ...mDefaultSchema.order.root,
+          }, newOrderKey))
+          .then(() => createData(mRefs.order.regItmes, {
+            ...regItems
+          }, newOrderKey))
+          .then(() => createData(mRefs.order.regItmes, {
+            ...customItems
+          }, newOrderKey))
           .then(() => {
             resolve({ result: newOrderKey });
           })
@@ -165,6 +191,21 @@ const runnerCatchOrderMutation = {
           }
           return refs.order.root.child(orderId).child('rId').set(user.uid);
         })
+        .then(() => findDataById(mRefs.order.root, ['oId', 'rId'], orderId)
+          .then((orders) => {
+            if (orders[0].oId === user.uid) {
+              throw new Error('Can\'t ship your port.');
+            }
+            if (orders[0].rId === user.uid) {
+              throw new Error('This ship is already designated for you.');
+            }
+            if (orders[0].rId) {
+              throw new Error('This ship is already designated for other user.');
+            }
+            return updateData(mRefs.order.root, { rId: user.uid }, orderId);
+          })
+          .catch(() => reject('Order doesn\'t exist.'))
+        )
         .then(() => {
         // TODO : impl use firebase database's user name data (now use firebase auth's name data)
           sendOrderCatchPush(order, user);
@@ -194,6 +235,10 @@ const userEvalOrderMutation = {
           m,
           comm
         })
+        .then(() => updateData(mRefs.order.root, {
+          uM: m,
+          uComm: comm
+        }, { where: { row_id: oId } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
       }
@@ -222,6 +267,10 @@ const runnerEvalOrderMutation = {
           m,
           comm
         })
+        .then(() => updateData(mRefs.order.root, {
+          rM: m,
+          rComm: comm
+        }, { where: { row_id: oId } }))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
       }
