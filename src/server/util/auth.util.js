@@ -14,6 +14,29 @@ export default {
       return next();
     }
     if (r.headers.authorization) {
+      // // mysql
+      // return decodeToken(r.headers.authorization)
+      //   .then((decodedToken) => {
+      //     r.user = decodedToken;
+      //     return findDataById(mRefs.user.root, ['e', 'permission', 'd'], r.user.uid)
+      //     .then((user) => {
+      //       if (user[0].permission === 'admin' && user[0].e === r.user.email) {
+      //         r.user.permission = 'admin';
+      //         return next();
+      //       }
+      //       if (!r.headers.device) throw new Error('No device id Error');
+      //       if (snap.val().d && snap.val().d !== r.headers.device) {
+      //         throw new Error('Another device logged in. Please login again.');
+      //       }
+      //       return next();
+      //     });
+      //   })
+      //   .catch(error => res.status(200).json({ errors: [{
+      //     message: error.message,
+      //     locations: error.locations,
+      //     stack: error.stack,
+      //     path: error.path
+      //   }] }));
       return admin.auth().verifyIdToken(r.headers.authorization)
         .then((decodedToken) => {
           r.user = decodedToken;
