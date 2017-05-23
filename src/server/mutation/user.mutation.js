@@ -275,7 +275,7 @@ const userAddAddressMutation = {
         sAddr,
         lat,
         lon
-      }, '5d356c10-3d11-11e7-9ad1-77c411db57c7'))
+      }, user.uid))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }

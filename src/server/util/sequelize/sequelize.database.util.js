@@ -311,6 +311,7 @@ const findDataById = (table, properties, id, idProp) => new Promise((resolve, re
     else if (idType === 'sub_id') where = { v: id };
   }
   return table[idRoot].findAll({
+    rejectOnEmpty: true,
     attributes,
     where,
     include:
@@ -367,6 +368,7 @@ const findData = (table, properties, condition) => new Promise((resolve, reject)
       .catch(reject);
   }
   return table[idRoot].findAll({
+    rejectOnEmpty: true,
     attributes,
     include:
       Object.keys(condition.where).map((prop) => {
