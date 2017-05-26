@@ -128,6 +128,7 @@ const UserType = new GraphQLObjectType({
     isRA: { type: GraphQLBoolean },
     mode: { type: GraphQLInt },
     rAAt: { type: GraphQLFloat },
+    rAAt: { type: GraphQLInt },
     isB: { type: GraphQLBoolean },
     coordinate: {
       type: CoordinateType,
