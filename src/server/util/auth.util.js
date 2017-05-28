@@ -17,7 +17,6 @@ export default {
       return next();
     }
     if (r.headers.authorization) {
-      console.log(r.headers.authorization);
       return decodeToken(r.headers.authorization)
         .then((result) => {
           r.user = result.user;
