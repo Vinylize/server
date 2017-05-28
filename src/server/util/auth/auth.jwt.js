@@ -9,28 +9,35 @@ const jwtKey = process.env.JWT_KEY;
 const jwtExp = process.env.JWT_EXP;
 
 const setToken = user => new Promise((resolve, reject) => {
-  jwt.sign(user, jwtKey, { expiresIn: jwtExp }, (err, token) => {
+  const exp = Math.floor(Date.now() / 1000) + Number(jwtExp);
+  jwt.sign({ ...user, exp }, jwtKey, { algorithm: 'HS256' }, (err, token) => {
     if (err) return reject(err);
-    return resolve(token);
+    return resolve({ user: { ...user, exp }, token });
   });
 });
 
 const decodeToken = token => new Promise((resolve, reject) => {
-  jwt.verify(token, jwtKey, (err, decoded) => {
+  jwt.verify(token, jwtKey, { algorithm: 'HS256' }, (err, user) => {
+    console.log(err);
     if (err) return reject(err);
-    return resolve(decoded);
+    return resolve({ user, token });
   });
 });
 
-const getAuth = (e, pw) => new Promise((resolve, reject) => {
-  findData(mRefs.root.user, ['e', 'pw', 'n', 'permission'], { where: { e } })
-  .then((user) => {
-    if (bcrypt.compareSync(pw, user[0].pw)) {
-      return setToken({ uid: user[0].row_id, e: user[0].e, n: user[0].n, permission: user[0].permission })
-      .then(token => resolve(token))
-      .catch(reject);
-    }
-    return reject('Paassword or email is wrong!');
+const getAuth = (e, pw, admin = false) => new Promise((resolve, reject) => {
+  findData(mRefs.user.root, ['e', 'pw', 'n', 'permission'], { where: { e } })
+  .then((users) => {
+    if (!bcrypt.compareSync(pw, users[0].pw)) return reject('Password or email is wrong!');
+    if (admin && users[0].permission !== 'admin') return reject('You are not an admin.');
+    const user = {
+      uid: users[0].row_id,
+      e: users[0].e,
+      n: users[0].n,
+      permission: users[0].permission
+    };
+    return setToken(user)
+    .then(result => resolve({ user: result.user, token: result.token }))
+    .catch(reject);
   })
   .catch(() => reject('Paassword or email is wrong!'));
 });

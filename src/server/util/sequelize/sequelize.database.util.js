@@ -6,7 +6,7 @@ const schema = {
   user: {
     root: {
       row_id: { v: { type: Sequelize.UUID, unique: 'v' } },
-      e: { v: { type: Sequelize.STRING } },
+      e: { v: { type: Sequelize.STRING, unique: 'v' } },
       pw: { v: { type: Sequelize.STRING } },
       n: { v: { type: Sequelize.STRING } },
       mode: { v: { type: Sequelize.INTEGER } },
