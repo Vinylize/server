@@ -140,12 +140,14 @@ const userCreateOrderMutation = {
             ...dest,
             ...mDefaultSchema.order.root,
           }, newOrderKey))
-          .then(() => createData(mRefs.order.regItmes, {
-            ...regItems
-          }, newOrderKey))
-          .then(() => createData(mRefs.order.regItmes, {
-            ...customItems
-          }, newOrderKey))
+          .then(() => {
+            if (regItems) return Promise.all(regItems.map(regItem => createData(mRefs.order.regItems, regItem, newOrderKey)));
+            return Promise.resolve();
+          })
+          .then(() => {
+            if (customItems) return Promise.all(customItems.map(customItem => createData(mRefs.order.customItems, customItem, newOrderKey)));
+            return Promise.resolve();
+          })
           .then(() => {
             resolve({ result: newOrderKey });
           })
@@ -202,7 +204,7 @@ const runnerCatchOrderMutation = {
             if (orders[0].rId) {
               throw new Error('This ship is already designated for other user.');
             }
-            return updateData(mRefs.order.root, { rId: user.uid }, orderId);
+            return updateData(mRefs.order.root, { rId: user.uid }, { where: { row_id: orderId } });
           })
           .catch(() => reject('Order doesn\'t exist.'))
         )
@@ -221,28 +223,32 @@ const userEvalOrderMutation = {
   name: 'userEvalOrder',
   description: 'user evaluate order',
   inputFields: {
-    oId: { type: new GraphQLNonNull(GraphQLString) },
+    orderId: { type: new GraphQLNonNull(GraphQLString) },
     m: { type: new GraphQLNonNull(GraphQLInt) },
     comm: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ orderId, m, comm }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      if (user.uid === oId) {
-        return refs.order.evalFromUser.child(oId).set({
-          m,
-          comm
-        })
-        .then(() => updateData(mRefs.order.root, {
-          uM: m,
-          uComm: comm
-        }, { where: { row_id: oId } }))
-        .then(() => resolve({ result: 'OK' }))
-        .catch(reject);
-      }
-      return reject('This user has no authorization for this order.');
+      return refs.order.root.child(orderId).child('oId').once('value')
+      .then((snap) => {
+        const oId = snap.val();
+        if (user.uid === oId) {
+          return refs.order.evalFromUser.child(orderId).set({
+            m,
+            comm
+          })
+          .then(() => updateData(mRefs.order.root, {
+            uM: m,
+            uComm: comm
+          }, { where: { row_id: orderId } }))
+          .then(() => resolve({ result: 'OK' }))
+          .catch(reject);
+        }
+        return reject('This user has no authorization for this order.');
+      });
     }
     return reject('This mutation needs accessToken.');
   })
@@ -252,29 +258,32 @@ const runnerEvalOrderMutation = {
   NAME: 'runnerEvalOrder',
   description: 'runner evaluate order',
   inputFields: {
-    oId: { type: new GraphQLNonNull(GraphQLString) },
+    orderId: { type: new GraphQLNonNull(GraphQLString) },
     m: { type: new GraphQLNonNull(GraphQLInt) },
     comm: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     result: { type: GraphQLString, resolve: payload => payload.result }
   },
-  mutateAndGetPayload: ({ oId, m, comm }, { user }) => new Promise((resolve, reject) => {
+  mutateAndGetPayload: ({ orderId, m, comm }, { user }) => new Promise((resolve, reject) => {
     if (user) {
-      const rId = refs.order.root.child(oId).child('rId').val();
-      if (user.uid === rId) {
-        return refs.order.evalFromRunner.child(oId).set({
-          m,
-          comm
-        })
-        .then(() => updateData(mRefs.order.root, {
-          rM: m,
-          rComm: comm
-        }, { where: { row_id: oId } }))
-        .then(() => resolve({ result: 'OK' }))
-        .catch(reject);
-      }
-      return reject('This user has no authorization for this order.');
+      return refs.order.root.child(orderId).child('rId').once('value')
+      .then((snap) => {
+        const rId = snap.val();
+        if (user.uid === rId) {
+          return refs.order.evalFromRunner.child(orderId).set({
+            m,
+            comm
+          })
+          .then(() => updateData(mRefs.order.root, {
+            rM: m,
+            rComm: comm
+          }, { where: { row_id: orderId } }))
+          .then(() => resolve({ result: 'OK' }))
+          .catch(reject);
+        }
+        return reject('This user has no authorization for this order.');
+      });
     }
     return reject('This mutation needs accessToken.');
   })

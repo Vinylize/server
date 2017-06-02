@@ -29,7 +29,7 @@ const schema = {
       sAAt: { v: { type: Sequelize.DATE } },
       lat: { v: { type: Sequelize.FLOAT } },
       lon: { v: { type: Sequelize.FLOAT } },
-      code: { v: { type: Sequelize.STRING } },
+      code: { v: { type: Sequelize.INTEGER } },
       vAt: { v: { type: Sequelize.DATE } },
       eAt: { v: { type: Sequelize.DATE } }
     },
@@ -95,12 +95,14 @@ const schema = {
     },
     regItems: {
       sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      iId: { v: { type: Sequelize.STRING } },
       n: { v: { type: Sequelize.STRING } },
       p: { v: { type: Sequelize.INTEGER } },
       cnt: { v: { type: Sequelize.INTEGER } }
     },
     customItems: {
       sub_id: { v: { type: Sequelize.UUID, unique: 'v' } },
+      iId: { v: { type: Sequelize.STRING } },
       n: { v: { type: Sequelize.STRING } },
       manu: { v: { type: Sequelize.STRING } },
       cnt: { v: { type: Sequelize.INTEGER } }
@@ -394,8 +396,8 @@ const findData = (table, properties, condition) => new Promise((resolve, reject)
 
 const createData = (table, properties, id) => new Promise((resolve, reject) => {
   let newId = uuid.v1();
-  if (id) newId = id;
   if (table.row_id) {
+    if (id) newId = id;
     return db.transaction(t => table.row_id.create({ v: newId }, { transaction: t })
       .then(() => Promise.all(
         Object.keys(properties).map((key) => {

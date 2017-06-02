@@ -64,10 +64,10 @@ const runnerApplyFirstJudgeMutation = {
       .then(() => refs.user.root.child(user.uid).child('isWJ').set(true))
       // mysql
       .then(() => findDataById(mRefs.user.root, ['idUrl', 'isPV', 'isRA'], user.uid)
-        .then((u) => {
-          if (!u.idUrl) return reject('Upload identification image first.');
-          if (!u.isPV) return reject('Verify your phone first.');
-          if (u.isRA) return reject('You are already a runner.');
+        .then((users) => {
+          if (!users[0].idUrl) return reject('Upload identification image first.');
+          if (!users[0].isPV) return reject('Verify your phone first.');
+          if (users[0].isRA) return reject('You are already a runner.');
           return resolve();
         })
         .then(() => updateData(mRefs.user.root, { isWJ: true }, { where: { row_id: user.uid } }))

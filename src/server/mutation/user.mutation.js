@@ -168,7 +168,7 @@ const userRequestPhoneVerifiactionMutation = {
       })
         .then(() => refs.user.root.child(user.uid).child('p').set(p))
         // mysql
-        .then(() => updateData(mRefs.user, {
+        .then(() => updateData(mRefs.user.root, {
           p,
           code,
           eAt: Date.now() + (120 * 1000)
@@ -195,7 +195,7 @@ const userResponsePhoneVerificationMutation = {
       return refs.user.phoneVerificationInfo.child(user.uid).once('value')
         .then((snap) => {
           if (snap.val().code === code && snap.val().eAt > Date.now()) {
-            return resolve();
+            return Promise.resolve();
           }
           if (snap.val().eAt < Date.now()) {
             // top priority
@@ -206,18 +206,17 @@ const userResponsePhoneVerificationMutation = {
         .then(() => refs.user.root.child(user.uid).child('isPV').set(true))
         .then(() => refs.user.phoneVerificationInfo.child(user.uid).child('vAt').set(Date.now()))
         // mysql
-        .then(() => findDataById(mRefs.user.root, ['code', 'eAt'], { where: { row_id: user.uid } })
+        .then(() => findDataById(mRefs.user.root, ['code', 'eAt'], user.uid)
           .then((users) => {
-            if (users[0].code === code && user[0].eAt > Date.now()) {
-              return resolve();
+            if (users[0].code === code && users[0].eAt > Date.now()) {
+              return Promise.resolve();
             }
             if (users[0].eAt < Date.now()) {
               return reject('time exceeded.');
             }
             throw new Error('Wrong code.');
           })
-          .then(() => updateData(mRefs.user.root, { isPv: true, vAt: Date.now() }, { where: { row_id: user.uid } }))
-        )
+          .then(() => updateData(mRefs.user.root, { isPV: true, vAt: Date.now() }, { where: { row_id: user.uid } })))
         .then(() => resolve({ result: 'OK' }))
         .catch(reject);
     }
@@ -240,7 +239,7 @@ const userAgreeMutation = {
         aAt: Date.now()
       })
       // mysql
-      .then(() => updateData(mRefs.user.root, { isA: true, aAt: Date.now() }, { where: { row_id: user.uid } }))
+      .then(() => updateData(mRefs.user.root, { isUA: true, uAAt: Date.now() }, { where: { row_id: user.uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
