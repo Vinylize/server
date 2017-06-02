@@ -163,10 +163,10 @@ Object.keys(schema).map((key1) => {
         primaryKey: true
       };
       if (key2 === 'root') {
-        if (key3 !== 'row_id') schema[key1][key2][key3].row_id = { type: Sequelize.UUID };
+        if (key3 !== 'row_id') schema[key1][key2][key3].row_id = { type: Sequelize.UUID, unique: 'row_id' };
       } else {
         schema[key1][key2][key3].row_id = { type: Sequelize.UUID };
-        if (key3 !== 'sub_id') schema[key1][key2][key3].sub_id = { type: Sequelize.UUID };
+        if (key3 !== 'sub_id') schema[key1][key2][key3].sub_id = { type: Sequelize.UUID, unique: 'sud_id' };
       }
     });
   });
