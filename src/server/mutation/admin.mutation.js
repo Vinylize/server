@@ -33,6 +33,10 @@ const authUserType = new GraphQLObjectType({
   name: 'authUser',
   description: 'auth user as output',
   fields: () => ({
+    uid: {
+      type: new GraphQLNonNull(GraphQLString),
+      resolve: user => user.uid
+    },
     e: {
       type: new GraphQLNonNull(GraphQLString),
       resolve: user => user.e
@@ -102,9 +106,10 @@ const adminRefreshAuthMutation = {
     if (user && user.permission === 'admin') {
       return decodeToken(token)
       .then(result1 => setToken({
-        e: result1.e,
-        n: result1.n,
-        permission: result1.permission
+        uid: result1.user.uid,
+        e: result1.user.e,
+        n: result1.user.n,
+        permission: result1.user.permission
       }))
       .then(result2 => resolve({ user: result2.user, token: result2.token }))
       .catch(err => reject(err));

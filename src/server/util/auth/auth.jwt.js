@@ -18,7 +18,6 @@ const setToken = user => new Promise((resolve, reject) => {
 
 const decodeToken = token => new Promise((resolve, reject) => {
   jwt.verify(token, jwtKey, { algorithm: 'HS256' }, (err, user) => {
-    console.log(err);
     if (err) return reject(err);
     return resolve({ user, token });
   });
