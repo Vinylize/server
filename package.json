@@ -1,11 +1,11 @@
 {
-  "name": "Vinyl",
+  "name": "graphql-server",
   "version": "0.0.1",
   "description": "",
   "main": "server.js",
   "scripts": {
     "test": "gulp test",
-    "start": "gulp server",
+    "start": "gulp dev",
     "lint": "eslint --ignore-path .gitignore src"
   },
   "pre-commit": [
@@ -13,14 +13,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vinylize/vinyl-server.git"
+    "url": "git+https://github.com/Vinylize/graphql-server.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Vinylize/vinyl-server/issues"
+    "url": "https://github.com/Vinylize/graphql-server/issues"
   },
-  "homepage": "https://github.com/Vinylize/vinyl-server#readme",
+  "homepage": "https://github.com/Vinylize/graphql-server#readme",
   "dependencies": {
     "avsc": "^5.0.3",
     "aws-sdk": "^2.27.0",
