@@ -67,7 +67,7 @@ const adminSignInMutation = {
     token: { type: new GraphQLNonNull(GraphQLString), resolve: payload => payload.token }
   },
   mutateAndGetPayload: ({ e, pw }) => new Promise((resolve, reject) => getAuth(e, pw, true)
-    .then(result => resolve(result))
+    .then(auth => resolve(auth))
     .catch(reject))
 };
 

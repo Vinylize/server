@@ -35,7 +35,7 @@ const server = (afterServerStartCallback) => {
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With,authorization,content-type');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With,authorization,permission,content-type');
     res.header('Access-Control-Allow-Methods', 'POST');
     next();
   });

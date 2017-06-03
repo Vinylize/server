@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import {
-  mRefs,
-  findData
+  mRefs
 } from '../sequelize/sequelize.database.util';
 
 const jwtKey = process.env.JWT_KEY;
@@ -24,7 +23,7 @@ const decodeToken = token => new Promise((resolve, reject) => {
 });
 
 const getAuth = (e, pw, admin = false) => new Promise((resolve, reject) => {
-  findData(mRefs.user.root, ['e', 'pw', 'n', 'permission'], { where: { e } })
+  mRefs.user.root.findData(['e', 'pw', 'n', 'permission'], { where: { e } })
   .then((users) => {
     if (!bcrypt.compareSync(pw, users[0].pw)) return reject('Password or email is wrong!');
     if (admin && users[0].permission !== 'admin') return reject('You are not an admin.');
@@ -35,7 +34,7 @@ const getAuth = (e, pw, admin = false) => new Promise((resolve, reject) => {
       permission: users[0].permission
     };
     return setToken(user)
-    .then(result => resolve({ user: result.user, token: result.token }))
+    .then(result => resolve(result))
     .catch(reject);
   })
   .catch(() => reject('Paassword or email is wrong!'));
