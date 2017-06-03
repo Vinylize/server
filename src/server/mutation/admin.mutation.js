@@ -14,8 +14,7 @@ import {
 } from '../util/firebase/firebase.database.util';
 
 import {
-  mRefs,
-  updateData
+  mRefs
 } from '../util/sequelize/sequelize.database.util';
 
 import {
@@ -146,7 +145,7 @@ const adminApproveRunnerFirstJudgeMutation = {
         rAAt: Date.now()
       })
       // mysql
-      .then(() => updateData(mRefs.user.root, { isWJ: false, isRA: true, rAAt: Date.now() }, { where: { row_id: uid } }))
+      .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: true, rAAt: Date.now() }, { where: { row_id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -181,7 +180,7 @@ const adminDisapproveRunnerFirstJudgeMutation = {
         rAAt: null
         // A 'Reason' of disapproving runner can be added
       })
-      .then(() => updateData(mRefs.user.root, { isWJ: false, isRA: false, rAAt: null }, { where: { row_id: uid } }))
+      .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: false, rAAt: null }, { where: { row_id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -206,7 +205,7 @@ const adminDisapproveRunnerMutation = {
         rAAt: null
       })
       // mysql
-      .then(() => updateData(mRefs.user.root, { isWJ: false, isRA: false, rAAt: null }, { where: { row_id: uid } }))
+      .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: false, rAAt: null }, { where: { row_id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -226,7 +225,7 @@ const adminBlockUserMutation = {
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
       return refs.user.root.child(uid).child('isB').set(true)
-      .then(() => updateData(mRefs.user.root, { isB: true }, { where: { row_id: uid } }))
+      .then(() => mRefs.user.root.updateData({ isB: true }, { where: { row_id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }
@@ -246,7 +245,7 @@ const adminUnblockUserMutation = {
   mutateAndGetPayload: ({ uid }, { user }) => new Promise((resolve, reject) => {
     if (user && user.permission === 'admin') {
       return refs.user.root.child(uid).child('isB').set(false)
-      .then(() => updateData(mRefs.user.root, { isB: false }, { where: { row_id: uid } }))
+      .then(() => mRefs.user.root.updateData({ isB: false }, { where: { row_id: uid } }))
       .then(() => resolve({ result: 'OK' }))
       .catch(reject);
     }

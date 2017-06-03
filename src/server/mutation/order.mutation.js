@@ -16,11 +16,8 @@ import {
 } from '../util/firebase/firebase.database.util';
 
 import {
-  mDefaultSchema,
   mRefs,
-  findDataById,
-  updateData,
-  createData
+  mDefaultSchema
 } from '../util/sequelize/sequelize.database.util';
 
 import {
@@ -128,7 +125,7 @@ const userCreateOrderMutation = {
           .then(() => refs.order.customItem.child(newOrderKey).set({
             ...customItems
           }))
-          .then(() => createData(mRefs.order.root, {
+          .then(() => mRefs.order.root.createData({
             oId: user.uid,
             nId,
             dC,
@@ -141,11 +138,11 @@ const userCreateOrderMutation = {
             ...mDefaultSchema.order.root,
           }, newOrderKey))
           .then(() => {
-            if (regItems) return Promise.all(regItems.map(regItem => createData(mRefs.order.regItems, regItem, newOrderKey)));
+            if (regItems) return Promise.all(regItems.map(regItem => mRefs.order.regItems.createData(regItem, newOrderKey)));
             return Promise.resolve();
           })
           .then(() => {
-            if (customItems) return Promise.all(customItems.map(customItem => createData(mRefs.order.customItems, customItem, newOrderKey)));
+            if (customItems) return Promise.all(customItems.map(customItem => mRefs.order.customItems.createData(customItem, newOrderKey)));
             return Promise.resolve();
           })
           .then(() => {
@@ -193,7 +190,7 @@ const runnerCatchOrderMutation = {
           }
           return refs.order.root.child(orderId).child('rId').set(user.uid);
         })
-        .then(() => findDataById(mRefs.order.root, ['oId', 'rId'], orderId)
+        .then(() => mRefs.order.root.findDataById(['oId', 'rId'], orderId)
           .then((orders) => {
             if (orders[0].oId === user.uid) {
               throw new Error('Can\'t ship your port.');
@@ -204,7 +201,7 @@ const runnerCatchOrderMutation = {
             if (orders[0].rId) {
               throw new Error('This ship is already designated for other user.');
             }
-            return updateData(mRefs.order.root, { rId: user.uid }, { where: { row_id: orderId } });
+            return mRefs.order.root.updateData({ rId: user.uid }, { where: { row_id: orderId } });
           })
           .catch(() => reject('Order doesn\'t exist.'))
         )
@@ -240,7 +237,7 @@ const userEvalOrderMutation = {
             m,
             comm
           })
-          .then(() => updateData(mRefs.order.root, {
+          .then(() => mRefs.order.root.updateData({
             uM: m,
             uComm: comm
           }, { where: { row_id: orderId } }))
@@ -275,7 +272,7 @@ const runnerEvalOrderMutation = {
             m,
             comm
           })
-          .then(() => updateData(mRefs.order.root, {
+          .then(() => mRefs.order.root.updateData({
             rM: m,
             rComm: comm
           }, { where: { row_id: orderId } }))

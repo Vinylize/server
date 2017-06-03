@@ -261,18 +261,179 @@ const mDefaultSchema = {
   }
 };
 
+class Reference {
+  constructor(key, object) {
+    this[key] = object;
+  }
+
+  setColumn(key, object) {
+    this[key] = object;
+  }
+
+  findDataById(properties, id, idProp) {
+    return new Promise((resolve, reject) => {
+      let where = {};
+      const idRoot = this.row_id ? 'row_id' : 'sub_id';
+      let idType = idProp;
+      if (!idProp) idType = idRoot;
+      let attributes = [];
+      if (idRoot === 'row_id') {
+        attributes = [['v', idRoot]];
+        where = { v: id };
+      } else {
+        attributes = ['row_id', ['v', idRoot]];
+        if (idType === 'row_id') where = { row_id: id };
+        else if (idType === 'sub_id') where = { v: id };
+      }
+      return this[idRoot].findAll({
+        rejectOnEmpty: true,
+        attributes,
+        where,
+        include:
+          properties.map((prop) => {
+            const condition = {};
+            condition[idType] = id;
+            if (prop !== idRoot && this[prop]) {
+              return {
+                model: this[prop],
+                as: prop,
+                attributes: [['v', prop]],
+                where: condition,
+                required: false,
+              };
+            }
+            return null;
+          })
+      })
+      .then((results) => {
+        const results2 = [];
+        let temp = {};
+        results.map((item) => {
+          temp = {};
+          temp.row_id = item.dataValues.row_id;
+          if (idRoot === 'sub_id') temp.sub_id = item.dataValues.sub_id;
+          Object.keys(item.dataValues).map((prop) => {
+            if (prop !== 'row_id' && prop !== 'sub_id') {
+              item.dataValues[prop].map((key) => {
+                temp[prop] = key.dataValues[prop];
+                return null;
+              });
+            }
+            return null;
+          });
+          results2.push(temp);
+          return null;
+        });
+        return resolve(results2);
+      })
+      .catch(reject);
+    });
+  }
+
+  findData(properties, condition) {
+    return new Promise((resolve, reject) => {
+      const idRoot = this.row_id ? 'row_id' : 'sub_id';
+      let attributes = [];
+      if (this.row_id) attributes = [['v', idRoot]];
+      else attributes = ['row_id', ['v', idRoot]];
+      if (Object.prototype.hasOwnProperty.call(condition.where, 'row_id') || Object.prototype.hasOwnProperty.call(condition.where, 'sub_id')) {
+        let idType = null;
+        if (Object.prototype.hasOwnProperty.call(condition.where, 'row_id')) idType = 'row_id';
+        if (Object.prototype.hasOwnProperty.call(condition.where, 'sub_id')) idType = 'sub_id';
+        return this.findDataById(properties, condition.where[idType], idType)
+          .then(result => resolve(result))
+          .catch(reject);
+      }
+      return this[idRoot].findAll({
+        rejectOnEmpty: true,
+        attributes,
+        include:
+          Object.keys(condition.where).map((prop) => {
+            if (prop !== idRoot && this[prop]) {
+              return {
+                model: this[prop],
+                as: prop,
+                attributes: [['v', prop]],
+                where: { v: condition.where[prop] },
+                required: true,
+              };
+            }
+            return null;
+          })
+      })
+        .then(results => Promise.all(results.map(result =>
+          this.findDataById(properties, result.dataValues[idRoot])
+          .then(result2 => result2[0])
+        )))
+        .then(result => resolve(result))
+        .catch(reject);
+    });
+  }
+
+  createData(properties, id) {
+    return new Promise((resolve, reject) => {
+      let newId = uuid.v1();
+      if (this.row_id) {
+        if (id) newId = id;
+        return db.transaction(t => this.row_id.create({ v: newId }, { transaction: t })
+          .then(() => Promise.all(
+            Object.keys(properties).map((key) => {
+              if (this[key]) return this[key].create({ row_id: newId, v: properties[key] }, { transaction: t });
+              return null;
+            })
+          )))
+          .then(() => resolve(newId))
+          .catch(reject);
+      }
+      return db.transaction(t => this.sub_id.create({ row_id: id, v: newId }, { transaction: t })
+        .then(() => Promise.all(
+          Object.keys(properties).map((key) => {
+            if (this[key]) return this[key].create({ row_id: id, sub_id: newId, v: properties[key] }, { transaction: t });
+            return null;
+          })
+        ))).then(() => resolve(newId))
+        .catch(reject);
+    });
+  }
+
+  updateData(properties, condition) {
+    return new Promise((resolve, reject) => this.findData([], condition)
+      .then(ids => db.transaction(t => Promise.all(
+        ids.map(id => Promise.all(
+          Object.keys(properties).map((key) => {
+            if (this.row_id) {
+              return this[key].findOne({ where: { row_id: id.row_id } }, { transaction: t })
+              .then((data) => {
+                if (data) return this[key].update({ v: properties[key] }, { where: { row_id: id.row_id } }, { transaction: t });
+                return this[key].create({ row_id: id.row_id, v: properties[key] }, { transaction: t });
+              });
+            }
+            return this[key].findOne({ where: { sub_id: id.sub_id } }, { transaction: t })
+            .then((data) => {
+              if (data) return this[key].update({ v: properties[key] }, { where: { sub_id: id.sub_id } }, { transaction: t });
+              return this[key].create({ row_id: id.row_id, sub_id: id.sub_id, v: properties[key] }, { transaction: t });
+            });
+          })
+        )))
+        .then(() => resolve(ids.map(v => Object.assign(v, properties))))))
+        .catch(reject)
+    );
+  }
+}
+
 
 /* eslint-disable array-callback-return */
 
 // Making associations among tables
 Object.keys(schema).map((key1) => {
   Object.keys(schema[key1]).map((key2) => {
+    mRefs[key1][key2] = new Reference();
     Object.keys(schema[key1][key2]).map((key3) => {
-      mRefs[key1][key2][key3] = db.define(`${key1}_${key2}_${key3}`, schema[key1][key2][key3], {
+      mRefs[key1][key2].setColumn(key3, db.define(`${key1}_${key2}_${key3}`, schema[key1][key2][key3], {
         timestamps: false,
         tableName: `${key1}_${key2}_${key3}`,
         freezeTableName: true
-      });
+      }));
     });
   });
 });
@@ -298,154 +459,8 @@ Object.keys(schema).map((key1) => {
 
 /* eslint-enable array-callback-return */
 
-const findDataById = (table, properties, id, idProp) => new Promise((resolve, reject) => {
-  let where = {};
-  const idRoot = table.row_id ? 'row_id' : 'sub_id';
-  let idType = idProp;
-  if (!idProp) idType = idRoot;
-  let attributes = [];
-  if (idRoot === 'row_id') {
-    attributes = [['v', idRoot]];
-    where = { v: id };
-  } else {
-    attributes = ['row_id', ['v', idRoot]];
-    if (idType === 'row_id') where = { row_id: id };
-    else if (idType === 'sub_id') where = { v: id };
-  }
-  return table[idRoot].findAll({
-    rejectOnEmpty: true,
-    attributes,
-    where,
-    include:
-      properties.map((prop) => {
-        const condition = {};
-        condition[idType] = id;
-        if (prop !== idRoot && table[prop]) {
-          return {
-            model: table[prop],
-            as: prop,
-            attributes: [['v', prop]],
-            where: condition,
-            required: false,
-          };
-        }
-        return null;
-      })
-  })
-  .then((results) => {
-    const results2 = [];
-    let temp = {};
-    results.map((item) => {
-      temp = {};
-      temp.row_id = item.dataValues.row_id;
-      if (idRoot === 'sub_id') temp.sub_id = item.dataValues.sub_id;
-      Object.keys(item.dataValues).map((prop) => {
-        if (prop !== 'row_id' && prop !== 'sub_id') {
-          item.dataValues[prop].map((key) => {
-            temp[prop] = key.dataValues[prop];
-            return null;
-          });
-        }
-        return null;
-      });
-      results2.push(temp);
-      return null;
-    });
-    return resolve(results2);
-  })
-  .catch(reject);
-});
-
-const findData = (table, properties, condition) => new Promise((resolve, reject) => {
-  const idRoot = table.row_id ? 'row_id' : 'sub_id';
-  let attributes = [];
-  if (table.row_id) attributes = [['v', idRoot]];
-  else attributes = ['row_id', ['v', idRoot]];
-  if (Object.prototype.hasOwnProperty.call(condition.where, 'row_id') || Object.prototype.hasOwnProperty.call(condition.where, 'sub_id')) {
-    let idType = null;
-    if (Object.prototype.hasOwnProperty.call(condition.where, 'row_id')) idType = 'row_id';
-    if (Object.prototype.hasOwnProperty.call(condition.where, 'sub_id')) idType = 'sub_id';
-    return findDataById(table, properties, condition.where[idType], idType)
-      .then(result => resolve(result))
-      .catch(reject);
-  }
-  return table[idRoot].findAll({
-    rejectOnEmpty: true,
-    attributes,
-    include:
-      Object.keys(condition.where).map((prop) => {
-        if (prop !== idRoot && table[prop]) {
-          return {
-            model: table[prop],
-            as: prop,
-            attributes: [['v', prop]],
-            where: { v: condition.where[prop] },
-            required: true,
-          };
-        }
-        return null;
-      })
-  })
-    .then(results => Promise.all(results.map(result =>
-      findDataById(table, properties, result.dataValues[idRoot])
-      .then(result2 => result2[0])
-    )))
-    .then(result => resolve(result))
-    .catch(reject);
-});
-
-const createData = (table, properties, id) => new Promise((resolve, reject) => {
-  let newId = uuid.v1();
-  if (table.row_id) {
-    if (id) newId = id;
-    return db.transaction(t => table.row_id.create({ v: newId }, { transaction: t })
-      .then(() => Promise.all(
-        Object.keys(properties).map((key) => {
-          if (table[key]) return table[key].create({ row_id: newId, v: properties[key] }, { transaction: t });
-          return null;
-        })
-      )))
-      .then(() => resolve(newId))
-      .catch(reject);
-  }
-  return db.transaction(t => table.sub_id.create({ row_id: id, v: newId }, { transaction: t })
-    .then(() => Promise.all(
-      Object.keys(properties).map((key) => {
-        if (table[key]) return table[key].create({ row_id: id, sub_id: newId, v: properties[key] }, { transaction: t });
-        return null;
-      })
-    ))).then(() => resolve(newId))
-    .catch(reject);
-});
-
-const updateData = (table, properties, condition) => new Promise((resolve, reject) => findData(table, [], condition)
-  .then(ids => db.transaction(t => Promise.all(
-    ids.map(id => Promise.all(
-      Object.keys(properties).map((key) => {
-        if (table.row_id) {
-          return table[key].findOne({ where: { row_id: id.row_id } }, { transaction: t })
-          .then((data) => {
-            if (data) return table[key].update({ v: properties[key] }, { where: { row_id: id.row_id } }, { transaction: t });
-            return table[key].create({ row_id: id.row_id, v: properties[key] }, { transaction: t });
-          });
-        }
-        return table[key].findOne({ where: { sub_id: id.sub_id } }, { transaction: t })
-        .then((data) => {
-          if (data) return table[key].update({ v: properties[key] }, { where: { sub_id: id.sub_id } }, { transaction: t });
-          return table[key].create({ row_id: id.row_id, sub_id: id.sub_id, v: properties[key] }, { transaction: t });
-        });
-      })
-    )))
-    .then(() => resolve(ids.map(v => Object.assign(v, properties))))))
-    .catch(reject)
-);
-
 export {
   mRefs,
   mDefaultSchema,
-  createData,
-  updateData,
-  findData,
-  findDataById,
   db
 };

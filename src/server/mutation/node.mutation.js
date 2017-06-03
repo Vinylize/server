@@ -11,12 +11,11 @@ import {
 import {
   defaultSchema,
   refs,
-  createData
 } from '../util/firebase/firebase.database.util';
 
 import {
-  mDefaultSchema,
-  mRefs
+  mRefs,
+  mDefaultSchema
 } from '../util/sequelize/sequelize.database.util';
 
 import {
@@ -70,7 +69,7 @@ const createNodeFromAdminMutation = {
           ...defaultSchema.node.root
         })
         // mysql
-        .then(() => createData(mRefs.node.root, {
+        .then(() => mRefs.node.root.createData({
           id: newNodeKey,
           n,
           p,

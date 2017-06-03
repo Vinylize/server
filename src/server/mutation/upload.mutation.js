@@ -11,8 +11,7 @@ import {
 } from '../util/firebase/firebase.database.util';
 
 import {
-  mRefs,
-  updateData
+  mRefs
 } from '../util/sequelize/sequelize.database.util';
 
 import {
@@ -64,7 +63,7 @@ const userUploadProfileImageMutation = {
           const imgUrl = `${s3BaseUrl}${s3BucketName}/${key}`;
           return refs.user.root.child(user.uid).child('pUrl').set(imgUrl)
             // mysql
-            .then(() => updateData(mRefs.user.root, { pUrl: imgUrl }, { row_id: user.uid }))
+            .then(() => mRefs.user.root.updateData({ pUrl: imgUrl }, { row_id: user.uid }))
             .then(() => resolve({ imgUrl }));
         });
       }
@@ -100,7 +99,7 @@ const userUploadIdImageMutation = {
           const imgUrl = `${s3BaseUrl}${s3BucketName}/${key}`;
           return refs.user.root.child(user.uid).child('idUrl').set(imgUrl)
           // mysql
-            .then(() => updateData(mRefs.user.root, { idUrl: imgUrl }, { row_id: user.uid }))
+            .then(() => mRefs.user.root.updateData({ idUrl: imgUrl }, { row_id: user.uid }))
             .then(() => resolve({ imgUrl }));
         });
       }
@@ -155,7 +154,7 @@ const uploadNodeImageMutation = {
           const imgUrl = `${s3BaseUrl}${s3BucketName}/${key}`;
           return refs.node.root.child(nodeId).child('imgUrl').set(imgUrl)
           // mysql
-            .then(() => updateData(mRefs.node.root, { imgUrl }, { row_id: user.uid }))
+            .then(() => mRefs.node.root.updateData({ imgUrl }, { row_id: user.uid }))
             .then(() => resolve({ imgUrl }));
         });
       }
