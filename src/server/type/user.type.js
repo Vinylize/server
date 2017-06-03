@@ -11,6 +11,7 @@ import GeoFire from 'geofire';
 
 import category from '../../shared/category/category';
 
+import CoordinateType from '../type/coordinate.type';
 import NodeType from '../type/node.type';
 import { OrderType } from '../type/order.type';
 
@@ -31,7 +32,7 @@ const UserQualificationType = new GraphQLObjectType({
   description: 'Type of properties of port.',
   fields: () => ({
     isA: { type: GraphQLBoolean },
-    aAt: { type: GraphQLInt }
+    aAt: { type: GraphQLFloat }
   })
 });
 
@@ -40,18 +41,9 @@ const RunnerQualificationType = new GraphQLObjectType({
   description: 'Type of properties of ship.',
   fields: () => ({
     isA: { type: GraphQLBoolean },
-    aAt: { type: GraphQLInt },
+    aAt: { type: GraphQLFloat },
     isSA: { type: GraphQLBoolean },
-    sAAt: { type: GraphQLInt }
-  })
-});
-
-const CoordinateType = new GraphQLObjectType({
-  name: 'coordinate',
-  description: 'CoordinateType of user.',
-  fields: () => ({
-    lat: { type: GraphQLFloat },
-    lon: { type: GraphQLFloat }
+    sAAt: { type: GraphQLFloat }
   })
 });
 
@@ -92,8 +84,8 @@ const PhoneVerificationInfoType = new GraphQLObjectType({
   description: 'phoneVerificationInfoType of user.',
   fields: () => ({
     code: { type: GraphQLInt },
-    eAt: { type: GraphQLInt },
-    vAt: { type: GraphQLInt }
+    eAt: { type: GraphQLFloat },
+    vAt: { type: GraphQLFloat }
   })
 });
 
@@ -102,9 +94,9 @@ const HelpType = new GraphQLObjectType({
   description: 'helpType of user.',
   fields: () => ({
     comm: { type: GraphQLString },
-    cAt: { type: GraphQLInt },
+    cAt: { type: GraphQLFloat },
     ans: { type: GraphQLString },
-    ansAt: { type: GraphQLInt }
+    ansAt: { type: GraphQLFloat }
   })
 });
 
@@ -118,7 +110,7 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLString },
     e: { type: GraphQLString },
     n: { type: GraphQLString },
-    cAt: { type: GraphQLInt },
+    cAt: { type: GraphQLFloat },
     p: { type: GraphQLString },
     isPV: { type: GraphQLBoolean },
     r: { type: GraphQLFloat },
@@ -126,14 +118,15 @@ const UserType = new GraphQLObjectType({
     idUrl: { type: GraphQLString },
     isWJ: { type: GraphQLBoolean },
     isRA: { type: GraphQLBoolean },
-    rAAt: { type: GraphQLInt },
+    mode: { type: GraphQLInt },
+    rAAt: { type: GraphQLFloat },
     isB: { type: GraphQLBoolean },
     coordinate: {
       type: CoordinateType,
       resolve: source => new Promise((resolve, reject) => {
         refs.user.coordinate.child(source.id).once('value')
-            .then(snap => resolve(snap.val()))
-            .catch(reject);
+          .then(snap => resolve({ lat: snap.val().l[0], lon: snap.val().l[1] }))
+          .catch(reject);
       })
     },
     userQualification: {
@@ -268,7 +261,7 @@ const UserType = new GraphQLObjectType({
     node: {
       type: NodeType,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLFloat) },
+        id: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve: (_, { id }) => new Promise((resolve, reject) => {
         refs.node.root.child(id).once('value')
