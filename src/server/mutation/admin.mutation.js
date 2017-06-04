@@ -18,6 +18,11 @@ import {
 } from '../util/sequelize/sequelize.database.util';
 
 import {
+  topics,
+  produceMessage
+} from '../util/kafka.util';
+
+import {
   mailType,
   sendMail
 } from '../util/mail.util';
@@ -145,9 +150,12 @@ const adminApproveRunnerFirstJudgeMutation = {
         rAAt: Date.now()
       })
       // mysql
-      .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: true, rAAt: Date.now() }, { where: { row_id: uid } }))
-      .then(() => resolve({ result: 'OK' }))
-      .catch(reject);
+        .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: true, rAAt: Date.now() }, { where: { row_id: uid } }))
+        .then(() => {
+          produceMessage(topics.ADMIN_APPROVE_RUNNER, uid);
+        })
+        .then(() => resolve({ result: 'OK' }))
+        .catch(reject);
     }
     return reject('This mutation needs accessToken.');
   })
@@ -180,9 +188,12 @@ const adminDisapproveRunnerFirstJudgeMutation = {
         rAAt: null
         // A 'Reason' of disapproving runner can be added
       })
-      .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: false, rAAt: null }, { where: { row_id: uid } }))
-      .then(() => resolve({ result: 'OK' }))
-      .catch(reject);
+        .then(() => mRefs.user.root.updateData({ isWJ: false, isRA: false, rAAt: null }, { where: { row_id: uid } }))
+        .then(() => {
+          produceMessage(topics.ADMIN_DISAPPROVE_RUNNER, uid);
+        })
+        .then(() => resolve({ result: 'OK' }))
+        .catch(reject);
     }
     return reject('This mutation needs accessToken.');
   })

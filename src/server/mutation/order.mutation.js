@@ -25,6 +25,11 @@ import {
   sendOrderCatchPush
 } from '../util/selectivePush.util';
 
+import {
+  topics,
+  produceMessage
+} from '../util/kafka.util';
+
 import calcPrice from '../util/order.util';
 
 const RegularItemType = new GraphQLInputObjectType({
@@ -149,7 +154,7 @@ const userCreateOrderMutation = {
             resolve({ result: newOrderKey });
           })
           .then(() => {
-            sendOrderAllPush({ oId: user.uid, nId, id: newOrderKey, eDP, dest, curr });
+            produceMessage(topics.ORDER_CREATE, newOrderKey);
           })
           .catch(reject);
         });
@@ -207,7 +212,7 @@ const runnerCatchOrderMutation = {
         )
         .then(() => {
         // TODO : impl use firebase database's user name data (now use firebase auth's name data)
-          sendOrderCatchPush(order, user);
+          produceMessage(topics.ORDER_CATCH, orderId);
           resolve({ result: 'OK' });
         })
         .catch(reject);
