@@ -15,8 +15,8 @@ const setToken = user => new Promise((resolve, reject) => {
   });
 });
 
-const decodeToken = token => new Promise((resolve, reject) => {
-  jwt.verify(token, jwtKey, { algorithm: 'HS256' }, (err, user) => {
+const decodeToken = (token, ignoreExpiration = false) => new Promise((resolve, reject) => {
+  jwt.verify(token, jwtKey, { algorithm: 'HS256', ignoreExpiration }, (err, user) => {
     if (err) return reject(err);
     return resolve({ user, token });
   });
@@ -40,8 +40,18 @@ const getAuth = (e, pw, admin = false) => new Promise((resolve, reject) => {
   .catch(() => reject('Paassword or email is wrong!'));
 });
 
+const refreshToken = (token, ignoreExpiration = false) =>
+  decodeToken(token, ignoreExpiration)
+  .then(decoded => setToken({
+    uid: decoded.user.uid,
+    e: decoded.user.e,
+    n: decoded.user.n,
+    permission: decoded.user.permission
+  }));
+
 export {
   setToken,
   decodeToken,
-  getAuth
+  refreshToken,
+  getAuth,
 };

@@ -77,7 +77,7 @@ const server = (afterServerStartCallback) => {
           // TODO : Find why `logger.debug(ext.result)` doesn't work on this part.
           // logger.debug(ext.result);
           console.log(ext.result);
-          return { runTime: `${Date.now() - startTime}ms` };
+          return { runTime: `${Date.now() - startTime}ms`, auth: { user: request.user, token: request.token } };
         }
       };
     }));

@@ -3,8 +3,7 @@ import {
   refs
 } from './firebase/firebase.database.util';
 import {
-  decodeToken,
-  setToken
+  refreshToken
 } from './auth/auth.jwt';
 import {
   mRefs
@@ -22,29 +21,21 @@ export default {
     }
     if (r.headers.authorization) {
       if (r.headers.permission === 'admin') {
-        return decodeToken(r.headers.authorization)
-          .then((decoded) => {
-            r.user = decoded.user;
-            return setToken({
-              uid: decoded.user.uid,
-              e: decoded.user.e,
-              n: decoded.user.n,
-              permission: decoded.user.permission
-            })
-            .then((authUser) => {
-              r.newToken = authUser.token;
-              return mRefs.user.root.findDataById(['e', 'permission', 'd'], r.user.uid)
-              .then((users) => {
-                if (users[0].permission === 'admin' && users[0].e === r.user.e) {
-                  r.user.permission = 'admin';
-                  return next();
-                }
-                if (!r.headers.device) throw new Error('No device id Error');
-                if (users[0].d && users[0].d !== r.headers.device) {
-                  throw new Error('Another device logged in. Please login again.');
-                }
+        return refreshToken(r.headers.authorization, true)
+          .then((authUser) => {
+            r.user = authUser.user;
+            r.token = authUser.token;
+            return mRefs.user.root.findDataById(['e', 'permission', 'd'], r.user.uid)
+            .then((users) => {
+              if (users[0].permission === 'admin' && users[0].e === r.user.e) {
+                r.user.permission = 'admin';
                 return next();
-              });
+              }
+              if (!r.headers.device) throw new Error('No device id Error');
+              if (users[0].d && users[0].d !== r.headers.device) {
+                throw new Error('Another device logged in. Please login again.');
+              }
+              return next();
             });
           })
           .catch(error => res.status(200).json({ errors: [{
