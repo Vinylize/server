@@ -111,24 +111,6 @@ const userUploadIdImageMutation = {
   })
 };
 
-const runnerUploadReciptImageMutation = {
-  name: 'runnerUploadReciptImage',
-  description: '',
-  inputFields: {},
-  outputFields: {
-    imageUrl: { type: GraphQLString, resolve: payload => payload.imgUrl }
-  },
-  mutateAndGetPayload: (args, { user, file }) => new Promise((resolve, reject) => {
-    if (user) {
-      if (file) {
-        console.log('upload file to s3 & firebase here.');
-      }
-      return reject('invalid or no file.');
-    }
-    return reject('This mutation needs accessToken.');
-  })
-};
-
 const uploadNodeImageMutation = {
   name: 'uploadNodeImage',
   description: '',
@@ -173,6 +155,24 @@ const uploadNodeItemImageMutation = {
   inputFields: {},
   outputFields: {
     imgUrl: { type: GraphQLString, resolve: payload => payload.imgUrl }
+  },
+  mutateAndGetPayload: (args, { user, file }) => new Promise((resolve, reject) => {
+    if (user) {
+      if (file) {
+        console.log('upload file to s3 & firebase here.');
+      }
+      return reject('invalid or no file.');
+    }
+    return reject('This mutation needs accessToken.');
+  })
+};
+
+const runnerUploadReciptImageMutation = {
+  name: 'runnerUploadReciptImage',
+  description: '',
+  inputFields: {},
+  outputFields: {
+    imageUrl: { type: GraphQLString, resolve: payload => payload.imgUrl }
   },
   mutateAndGetPayload: (args, { user, file }) => new Promise((resolve, reject) => {
     if (user) {
